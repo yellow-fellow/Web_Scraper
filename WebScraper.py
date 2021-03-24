@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+#
 # In[1]:
 
 
@@ -17,8 +17,6 @@ translator = google_translator()
 
 
 # In[7]:
-
-
 
 
 df = pd.read_excel('vast-tag.xlsx')
@@ -51,27 +49,29 @@ website = ''
 stored_text = ''
 temp_dict = {}
 
-#while (website != 'exit') and (website != 'translate'):
+# while (website != 'exit') and (website != 'translate'):
 try:
-    user_input = input("Please ensure that your link has \033[1m https:// \033[0m \n\n")
+    user_input = input(
+        "Please ensure that your link has \033[1m https:// \033[0m \n\n")
     website = str(user_input)
     temp_dict['URL'] = website
     html_text = requests.get(website, headers={
-'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
-}).text
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
+    }).text
     clear_output(wait=True)
 except:
-    pass#continue
-soup = BeautifulSoup(html_text,'lxml')
+    pass  # continue
+soup = BeautifulSoup(html_text, 'lxml')
 meta_tags = soup.find_all('meta')
 
 #exclusion_list = ['https://','width','charset','image','jpeg','index','@detikcom','max-snippet','wordpress','chrome=1','ie=edge','2021','rgb','2020','singlepage','app-id','desktop','article','.org']
 
 # <meta property="og:title" content="The faces of the #SAF44">
 # Targetting meta-property tags
-property_list = ['description','keywords','title','category','categories','article:section']
+property_list = ['description', 'keywords', 'title',
+                 'category', 'categories', 'article:section']
 
-#print(soup.prettify())
+# print(soup.prettify())
 
 try:
     print('\n\033[1mFULL-URL-DIRECTORY\033[0m')
@@ -84,7 +84,6 @@ try:
     first_directory = category.split('/')[0]
     print(first_directory)
     temp_dict['First-URL-Directory'] = first_directory
-
 
     print('\n\033[1mSECOND-URL-DIRECTORY\033[0m')
     second_directory = category.split('/')[1]
@@ -99,7 +98,8 @@ print(property_text)
 for content in meta_tags:
     try:
         if (any(item in content['property'].lower() for item in property_list)):
-            print('\nProperty: '+ content.get("property", None) + " --> " + content['content'])
+            print('\nProperty: ' + content.get("property", None) +
+                  " --> " + content['content'])
             stored_text += '\n' + content['content']
     except:
         pass
@@ -109,7 +109,8 @@ print(name_text)
 for content in meta_tags:
     try:
         if (any(item in content['name'].lower() for item in property_list)):
-            print('\nName: '+ content.get("name", None) + " --> " + content['content'])
+            print('\nName: ' + content.get("name", None) +
+                  " --> " + content['content'])
             stored_text += '\n' + content['content']
     except:
         pass
@@ -122,20 +123,20 @@ print("\n\033[1mA-TAGS \033[0m")
 div_tags = soup.find_all("div")
 for div_tag in div_tags:
     try:
-        a_tags = div_tag.find_all("a",{"class":"tag-detail"})
+        a_tags = div_tag.find_all("a", {"class": "tag-detail"})
         for a in a_tags:
-            print('\nDIV-A-Tags: '+ a.text)
+            print('\nDIV-A-Tags: ' + a.text)
             stored_text += '\n' + a.text
     except:
         pass
 
 temp_dict['Tags'] = stored_text
 print(temp_dict)
-            
-        
+
+
 if (website == 'translate'):
     print("\n\033[1mTRANSLATED-TEXT\033[0m")
-    translate_text = translator.translate(stored_text, lang_tgt='en')  
+    translate_text = translator.translate(stored_text, lang_tgt='en')
     print('\n' + translate_text)
 
 
@@ -147,7 +148,3 @@ with open('data.json', 'w') as outfile:
 
 
 # In[ ]:
-
-
-
-

@@ -48,6 +48,8 @@ user_input = str(df['feb-22-28'][0])
 website = ''
 stored_text = ''
 temp_dict = {}
+tags_dict = {}
+tags_array = []
 
 # while (website != 'exit') and (website != 'translate'):
 try:
@@ -101,6 +103,7 @@ for content in meta_tags:
             print('\nProperty: ' + content.get("property", None) +
                   " --> " + content['content'])
             stored_text += '\n' + content['content']
+            tags_dict[content.get("property", None)] = content['content']
     except:
         pass
 
@@ -112,6 +115,7 @@ for content in meta_tags:
             print('\nName: ' + content.get("name", None) +
                   " --> " + content['content'])
             stored_text += '\n' + content['content']
+            tags_dict[content.get("property", None)] = content['content']
     except:
         pass
 
@@ -127,10 +131,11 @@ for div_tag in div_tags:
         for a in a_tags:
             print('\nDIV-A-Tags: ' + a.text)
             stored_text += '\n' + a.text
+            tags_dict["keywords - a-tags"] = tags_dict["keywords - a-tags"] + " " + a.text
     except:
         pass
 
-temp_dict['Tags'] = stored_text
+print(tags_dict)
 print(temp_dict)
 
 
@@ -143,8 +148,8 @@ if (website == 'translate'):
 # In[16]:
 
 
-with open('data.json', 'w') as outfile:
-    json.dump(temp_dict, outfile)
+# with open('data.json', 'w') as outfile:
+#     json.dump(temp_dict, outfile)
 
 
 # In[ ]:

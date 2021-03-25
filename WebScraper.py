@@ -77,7 +77,12 @@ for site in df.iloc[:, 0]:
     property_list = ['description', 'keywords', 'title',
                      'category', 'categories', 'article:section']
 
-    # print(soup.prettify())
+    # ----------------------------------------------------------
+    # Pre-fill path with NIL string in the event there is no directory
+    temp_dict['Full-URL-Path'] = "NIL"
+    temp_dict['First-URL-Directory'] = "NIL"
+    temp_dict['Second-URL-Directory'] = "NIL"
+    # ----------------------------------------------------------
 
     try:
         print('\n\033[1mFULL-URL-DIRECTORY\033[0m')
@@ -143,7 +148,7 @@ for site in df.iloc[:, 0]:
 
     print(temp_dict)
 
-    with open('data.json', 'w') as outfile:
+    with open('data.json', 'a') as outfile:
         json.dump(temp_dict, outfile)
         outfile.write('\n')
 
@@ -152,9 +157,4 @@ for site in df.iloc[:, 0]:
         translate_text = translator.translate(stored_text, lang_tgt='en')
         print('\n' + translate_text)
 
-
-# In[16]:
-
-with open('data.json', 'w') as outfile:
-    json.dump(temp_dict, outfile)
-    outfile.write('\n')
+# %%

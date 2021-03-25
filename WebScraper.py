@@ -2,8 +2,6 @@
 # coding: utf-8
 ###
 # In[1]:
-
-
 from bs4 import BeautifulSoup
 import url_parser
 import requests
@@ -14,12 +12,10 @@ import json
 import pandas as pd
 
 translator = google_translator()
-
-
 # In[7]:
 
 
-df = pd.read_excel('vast-tag.xlsx')
+df = pd.read_excel('test.xlsx')
 
 print(df['feb-22-28'][17])
 
@@ -135,8 +131,14 @@ for div_tag in div_tags:
     except:
         pass
 
-print(tags_dict)
+
+tags_array.append(tags_dict)
+temp_dict['tags'] = tags_array
+
 print(temp_dict)
+
+with open('data.json', 'w') as outfile:
+    json.dump(temp_dict, outfile)
 
 
 if (website == 'translate'):
@@ -147,9 +149,8 @@ if (website == 'translate'):
 
 # In[16]:
 
-
-# with open('data.json', 'w') as outfile:
-#     json.dump(temp_dict, outfile)
+with open('data.json', 'w') as outfile:
+    json.dump(temp_dict, outfile)
 
 
 # In[ ]:

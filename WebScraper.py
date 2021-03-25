@@ -1,7 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
-###
-# In[1]:
+# In[]
+# ----------------------------------------------------------
+# Import libraries
+
 from bs4 import BeautifulSoup
 import url_parser
 import requests
@@ -12,38 +12,15 @@ import json
 import pandas as pd
 
 translator = google_translator()
-# In[7]:
 
+# ----------------------------------------------------------
+# In[15]
 
-# df = pd.read_excel('test.xlsx')
-
-# print(df['feb-22-28'][17])
-
-# user_input = str(df['feb-22-28'][0])
-
-
-# In[13]:
-
-
-#import json
-
-# database = {}
-# a = 'sites'
-# data[a] = []
-# database["hello"] = a
-
-# print(database)
-
-# with open('data.json', 'w') as outfile:
-#     json.dump(data, outfile)
-
-
-# In[15]:
-
-df = pd.read_excel('test.xlsx')
+# ----------------------------------------------------------
+# Select excel sheet as input
+df = pd.read_excel('QA_test.xlsx')
+# ----------------------------------------------------------
 for site in df.iloc[:, 0]:
-    print(site)
-
     website = ''
     stored_text = ''
     user_input = ''
@@ -86,11 +63,11 @@ for site in df.iloc[:, 0]:
 
     try:
         print('\n\033[1mFULL-URL-DIRECTORY\033[0m')
-        print(url_parser.parse_url(user_input)['path'])
-        temp_dict['Full-URL-Path'] = url_parser.parse_url(user_input)['path']
+        print(url_parser.parse_url(site)['path'])
+        temp_dict['Full-URL-Path'] = url_parser.parse_url(site)['path']
 
         print('\n\033[1mFIRST-URL-DIRECTORY\033[0m')
-        category = url_parser.parse_url(user_input)['dir']
+        category = url_parser.parse_url(site)['dir']
         category = category[1:-1]
         first_directory = category.split('/')[0]
         print(first_directory)
@@ -146,11 +123,12 @@ for site in df.iloc[:, 0]:
     tags_array.append(tags_dict)
     temp_dict['tags'] = tags_array
 
-    print(temp_dict)
-
-    with open('data.json', 'a') as outfile:
+    # ----------------------------------------------------------
+    # Write data into JSON file
+    with open('QA_test.json', 'a') as outfile:
         json.dump(temp_dict, outfile)
         outfile.write('\n')
+    # ----------------------------------------------------------
 
     if (website == 'translate'):
         print("\n\033[1mTRANSLATED-TEXT\033[0m")

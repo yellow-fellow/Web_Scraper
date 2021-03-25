@@ -15,11 +15,11 @@ translator = google_translator()
 # In[7]:
 
 
-df = pd.read_excel('test.xlsx')
+# df = pd.read_excel('test.xlsx')
 
-print(df['feb-22-28'][17])
+# print(df['feb-22-28'][17])
 
-user_input = str(df['feb-22-28'][0])
+# user_input = str(df['feb-22-28'][0])
 
 
 # In[13]:
@@ -40,117 +40,121 @@ user_input = str(df['feb-22-28'][0])
 
 # In[15]:
 
+df = pd.read_excel('test.xlsx')
+for site in df.iloc[:, 0]:
+    print(site)
 
-website = ''
-stored_text = ''
-temp_dict = {}
-tags_dict = {}
-tags_array = []
+    website = ''
+    stored_text = ''
+    user_input = ''
+    temp_dict = {}
+    tags_dict = {}
+    tags_array = []
 
-# while (website != 'exit') and (website != 'translate'):
-try:
-    user_input = input(
-        "Please ensure that your link has \033[1m https:// \033[0m \n\n")
-    website = str(user_input)
-    temp_dict['URL'] = website
-    html_text = requests.get(website, headers={
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
-    }).text
-    clear_output(wait=True)
-except:
-    pass  # continue
-soup = BeautifulSoup(html_text, 'lxml')
-meta_tags = soup.find_all('meta')
-
-#exclusion_list = ['https://','width','charset','image','jpeg','index','@detikcom','max-snippet','wordpress','chrome=1','ie=edge','2021','rgb','2020','singlepage','app-id','desktop','article','.org']
-
-# <meta property="og:title" content="The faces of the #SAF44">
-# Targetting meta-property tags
-property_list = ['description', 'keywords', 'title',
-                 'category', 'categories', 'article:section']
-
-# print(soup.prettify())
-
-try:
-    print('\n\033[1mFULL-URL-DIRECTORY\033[0m')
-    print(url_parser.parse_url(user_input)['path'])
-    temp_dict['Full-URL-Path'] = url_parser.parse_url(user_input)['path']
-
-    print('\n\033[1mFIRST-URL-DIRECTORY\033[0m')
-    category = url_parser.parse_url(user_input)['dir']
-    category = category[1:-1]
-    first_directory = category.split('/')[0]
-    print(first_directory)
-    temp_dict['First-URL-Directory'] = first_directory
-
-    print('\n\033[1mSECOND-URL-DIRECTORY\033[0m')
-    second_directory = category.split('/')[1]
-    print(second_directory)
-    temp_dict['Second-URL-Directory'] = second_directory
-
-except:
-    pass
-
-property_text = "\n\033[1mPROPERTY-TAGS \033[0m"
-print(property_text)
-for content in meta_tags:
+    # while (website != 'exit') and (website != 'translate'):
     try:
-        if (any(item in content['property'].lower() for item in property_list)):
-            print('\nProperty: ' + content.get("property", None) +
-                  " --> " + content['content'])
-            stored_text += '\n' + content['content']
-            tags_dict[content.get("property", None)] = content['content']
+        # user_input = input(
+        #     "Please ensure that your link has \033[1m https:// \033[0m \n\n")
+        website = str(site)  # str(user_input)
+        temp_dict['URL'] = website
+        html_text = requests.get(website, headers={
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
+        }).text
+        clear_output(wait=True)
+    except:
+        pass  # continue
+
+    try:
+        soup = BeautifulSoup(html_text, 'lxml')
+        meta_tags = soup.find_all('meta')
+    except:
+        continue
+
+    #exclusion_list = ['https://','width','charset','image','jpeg','index','@detikcom','max-snippet','wordpress','chrome=1','ie=edge','2021','rgb','2020','singlepage','app-id','desktop','article','.org']
+
+    # <meta property="og:title" content="The faces of the #SAF44">
+    # Targetting meta-property tags
+    property_list = ['description', 'keywords', 'title',
+                     'category', 'categories', 'article:section']
+
+    # print(soup.prettify())
+
+    try:
+        print('\n\033[1mFULL-URL-DIRECTORY\033[0m')
+        print(url_parser.parse_url(user_input)['path'])
+        temp_dict['Full-URL-Path'] = url_parser.parse_url(user_input)['path']
+
+        print('\n\033[1mFIRST-URL-DIRECTORY\033[0m')
+        category = url_parser.parse_url(user_input)['dir']
+        category = category[1:-1]
+        first_directory = category.split('/')[0]
+        print(first_directory)
+        temp_dict['First-URL-Directory'] = first_directory
+
+        print('\n\033[1mSECOND-URL-DIRECTORY\033[0m')
+        second_directory = category.split('/')[1]
+        print(second_directory)
+        temp_dict['Second-URL-Directory'] = second_directory
+
     except:
         pass
 
-name_text = "\n\033[1mNAME-TAGS \033[0m"
-print(name_text)
-for content in meta_tags:
-    try:
-        if (any(item in content['name'].lower() for item in property_list)):
-            print('\nName: ' + content.get("name", None) +
-                  " --> " + content['content'])
-            stored_text += '\n' + content['content']
-            tags_dict[content.get("property", None)] = content['content']
-    except:
-        pass
+    property_text = "\n\033[1mPROPERTY-TAGS \033[0m"
+    print(property_text)
+    for content in meta_tags:
+        try:
+            if (any(item in content['property'].lower() for item in property_list)):
+                print('\nProperty: ' + content.get("property", None) +
+                      " --> " + content['content'])
+                stored_text += '\n' + content['content']
+                tags_dict[content.get("property", None)] = content['content']
+        except:
+            pass
 
+    name_text = "\n\033[1mNAME-TAGS \033[0m"
+    print(name_text)
+    for content in meta_tags:
+        try:
+            if (any(item in content['name'].lower() for item in property_list)):
+                print('\nName: ' + content.get("name", None) +
+                      " --> " + content['content'])
+                stored_text += '\n' + content['content']
+                tags_dict[content.get("property", None)] = content['content']
+        except:
+            pass
 
-# See if can use css-selector instead.
-# a_tags = soup.find_all("div > a")
-# may be lazy loading
-print("\n\033[1mA-TAGS \033[0m")
-div_tags = soup.find_all("div")
-for div_tag in div_tags:
-    try:
-        a_tags = div_tag.find_all("a", {"class": "tag-detail"})
-        for a in a_tags:
-            print('\nDIV-A-Tags: ' + a.text)
-            stored_text += '\n' + a.text
-            tags_dict["keywords - a-tags"] = tags_dict["keywords - a-tags"] + " " + a.text
-    except:
-        pass
+    # See if can use css-selector instead.
+    # a_tags = soup.find_all("div > a")
+    # may be lazy loading
+    print("\n\033[1mA-TAGS \033[0m")
+    div_tags = soup.find_all("div")
+    for div_tag in div_tags:
+        try:
+            a_tags = div_tag.find_all("a", {"class": "tag-detail"})
+            for a in a_tags:
+                print('\nDIV-A-Tags: ' + a.text)
+                stored_text += '\n' + a.text
+                tags_dict["keywords - a-tags"] = tags_dict["keywords - a-tags"] + " " + a.text
+        except:
+            pass
 
+    tags_array.append(tags_dict)
+    temp_dict['tags'] = tags_array
 
-tags_array.append(tags_dict)
-temp_dict['tags'] = tags_array
+    print(temp_dict)
 
-print(temp_dict)
+    with open('data.json', 'w') as outfile:
+        json.dump(temp_dict, outfile)
+        outfile.write('\n')
 
-with open('data.json', 'w') as outfile:
-    json.dump(temp_dict, outfile)
-
-
-if (website == 'translate'):
-    print("\n\033[1mTRANSLATED-TEXT\033[0m")
-    translate_text = translator.translate(stored_text, lang_tgt='en')
-    print('\n' + translate_text)
+    if (website == 'translate'):
+        print("\n\033[1mTRANSLATED-TEXT\033[0m")
+        translate_text = translator.translate(stored_text, lang_tgt='en')
+        print('\n' + translate_text)
 
 
 # In[16]:
 
 with open('data.json', 'w') as outfile:
     json.dump(temp_dict, outfile)
-
-
-# In[ ]:
+    outfile.write('\n')

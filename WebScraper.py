@@ -53,7 +53,7 @@ for site in df.iloc[:, 0]:
 
     # <meta property="og:title" content="The faces of the #SAF44">
     # Targetting meta-property tags
-    property_list = ['description', 'keywords', 'title',
+    property_list = ['description', 'keywords',
                      'category', 'categories', 'article:section']
 
     # ----------------------------------------------------------
@@ -64,24 +64,43 @@ for site in df.iloc[:, 0]:
     # ----------------------------------------------------------
 
     try:
+        # ----------------------------------------------------------
+        # Get the full-URL path from the URL
         print('\n\033[1mFULL-URL-DIRECTORY\033[0m')
         print(url_parser.parse_url(site)['path'])
         temp_dict['Full-URL-Path'] = url_parser.parse_url(site)['path']
+        # ----------------------------------------------------------
 
+        # ----------------------------------------------------------
+        # Get first directory from URL
         print('\n\033[1mFIRST-URL-DIRECTORY\033[0m')
         category = url_parser.parse_url(site)['dir']
         category = category[1:-1]
         first_directory = category.split('/')[0]
         print(first_directory)
         temp_dict['First-URL-Directory'] = first_directory
+        # ----------------------------------------------------------
 
+        # ----------------------------------------------------------
+        # Get second directory from URL
         print('\n\033[1mSECOND-URL-DIRECTORY\033[0m')
         second_directory = category.split('/')[1]
         print(second_directory)
         temp_dict['Second-URL-Directory'] = second_directory
+        # ----------------------------------------------------------
 
     except:
         pass
+
+    # ----------------------------------------------------------
+    # Search for the first "title" metatag and add it into the output
+    title = "NIL"
+    for tag in meta_tags:
+        if ("title" in tag['property'].lower()):
+            title = tag.['content']
+            break
+    temp_dict['Title'] = title
+    # ----------------------------------------------------------
 
     property_text = "\n\033[1mPROPERTY-TAGS \033[0m"
     print(property_text)
@@ -137,4 +156,8 @@ for site in df.iloc[:, 0]:
         translate_text = translator.translate(stored_text, lang_tgt='en')
         print('\n' + translate_text)
 
+# %%
+requests.get("https://bolastylo.bolasport.com/read", headers={
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
+})
 # %%

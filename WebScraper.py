@@ -102,6 +102,16 @@ for site in df.iloc[:, 0]:
     temp_dict['Title'] = title
     # ----------------------------------------------------------
 
+    # ----------------------------------------------------------
+    # Search for the "keywords" metatag and add it into the output (In array structure)
+    keywords = ""
+    for tag in meta_tags:
+        if ("keyword" in tag['property'].lower()):
+            keywords = keywords + tag.['content']
+    keywords_array = keywords.split()
+    temp_dict['Keywords'] = keywords_array
+    # ----------------------------------------------------------
+
     property_text = "\n\033[1mPROPERTY-TAGS \033[0m"
     print(property_text)
     for content in meta_tags:

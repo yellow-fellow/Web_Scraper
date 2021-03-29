@@ -109,21 +109,24 @@ for site in df.iloc[:, 0]:
     for tag in meta_tags:
         try:
             if ("keyword" in tag['property'].lower()):
-                keywords += tag['content']
+                keywords += " " + tag['content']
         except:
             pass
         try:
             if ("keyword" in tag['name'].lower()):
-                keywords += tag['content']
+                keywords += " " + tag['content']
         except:
             pass
 
+    # See if can use css-selector instead.
+    # a_tags = soup.find_all("div > a")
+    # may be lazy loading
     div_tags = soup.find_all("div")
     for div_tag in div_tags:
         try:
             a_tags = div_tag.find_all("a", {"class": "tag-detail"})
             for a in a_tags:
-                keywords += a.text
+                keywords += " " + a.text
         except:
             pass
     keywords_array = keywords.split()
@@ -136,27 +139,27 @@ for site in df.iloc[:, 0]:
     for tag in meta_tags:
         try:
             if ("category" in tag['property'].lower()):
-                categories += tag['content']
+                categories += " " + tag['content']
         except:
             pass
         try:
             if ("categories" in tag['property'].lower()):
-                categories += tag['content']
+                categories += " " + tag['content']
         except:
             pass
         try:
             if ("article:section" in tag['property'].lower()):
-                categories += tag['content']
+                categories += " " + tag['content']
         except:
             pass
         try:
             if ("category" in tag['name'].lower()):
-                categories += tag['content']
+                categories += " " + tag['content']
         except:
             pass
         try:
             if ("categories" in tag['name'].lower()):
-                categories += tag['content']
+                categories += " " + tag['content']
         except:
             pass
     categories_array = categories.split()
@@ -178,48 +181,6 @@ for site in df.iloc[:, 0]:
             pass
     temp_dict['Description'] = description
     # ----------------------------------------------------------
-
-    property_text = "\n\033[1mPROPERTY-TAGS \033[0m"
-    print(property_text)
-    for content in meta_tags:
-        try:
-            if (any(item in content['property'].lower() for item in property_list)):
-                print('\nProperty: ' + content.get("property", None) +
-                      " --> " + content['content'])
-                stored_text += '\n' + content['content']
-                tags_dict[content.get("property", None)] = content['content']
-        except:
-            pass
-
-    name_text = "\n\033[1mNAME-TAGS \033[0m"
-    print(name_text)
-    for content in meta_tags:
-        try:
-            if (any(item in content['name'].lower() for item in property_list)):
-                print('\nName: ' + content.get("name", None) +
-                      " --> " + content['content'])
-                stored_text += '\n' + content['content']
-                tags_dict[content.get("name", None)] = content['content']
-        except:
-            pass
-
-    # See if can use css-selector instead.
-    # a_tags = soup.find_all("div > a")
-    # may be lazy loading
-    print("\n\033[1mA-TAGS \033[0m")
-    div_tags = soup.find_all("div")
-    for div_tag in div_tags:
-        try:
-            a_tags = div_tag.find_all("a", {"class": "tag-detail"})
-            for a in a_tags:
-                print('\nDIV-A-Tags: ' + a.text)
-                stored_text += '\n' + a.text
-                tags_dict["keywords - a-tags"] = tags_dict["keywords - a-tags"] + " " + a.text
-        except:
-            pass
-
-    tags_array.append(tags_dict)
-    temp_dict['tags'] = tags_array
 
     # ----------------------------------------------------------
     # Write data into JSON file

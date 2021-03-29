@@ -33,6 +33,7 @@ for site in df.iloc[:, 0]:
         # user_input = input(
         #     "Please ensure that your link has \033[1m https:// \033[0m \n\n")
         website = str(site)  # str(user_input)
+        temp_dict['domain'] = url_parser.parse_url(site)['domain']
         temp_dict['URL'] = website
         html_text = requests.get(website, headers={
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',

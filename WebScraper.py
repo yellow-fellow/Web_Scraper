@@ -33,8 +33,6 @@ for site in df.iloc[:, 0]:
         # user_input = input(
         #     "Please ensure that your link has \033[1m https:// \033[0m \n\n")
         website = str(site)  # str(user_input)
-        if website[0:9] != "https://":
-            website = "https://" + website
         temp_dict['URL'] = website
         html_text = requests.get(website, headers={
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
@@ -53,8 +51,8 @@ for site in df.iloc[:, 0]:
 
     # <meta property="og:title" content="The faces of the #SAF44">
     # Targetting meta-property tags
-    property_list = ['description', 'keywords',
-                     'category', 'categories', 'article:section']
+    property_list = ['description', 'title', 'keyword',
+                     'categories', 'category', 'article:section']
 
     # ----------------------------------------------------------
     # Pre-fill path with NIL string in the event there is no directory
@@ -96,9 +94,12 @@ for site in df.iloc[:, 0]:
     # Search for the first "title" metatag and add it into the output
     title = "NIL"
     for tag in meta_tags:
-        if ("title" in tag['property'].lower()):
-            title = tag.['content']
-            break
+        try:
+            if ("title" in tag['property'].lower()):
+                title = tag['content']
+                break
+        except:
+            pass
     temp_dict['Title'] = title
     # ----------------------------------------------------------
 
@@ -106,10 +107,53 @@ for site in df.iloc[:, 0]:
     # Search for the "keywords" metatag and add it into the output (In array structure)
     keywords = ""
     for tag in meta_tags:
-        if ("keyword" in tag['property'].lower()):
-            keywords = keywords + tag.['content']
+        try:
+            if ("keyword" in tag['property'].lower()):
+                keywords = keywords + tag['content']
+            if ("keyword" in tag['name'].lower()):
+                keywords = keywords + tag['content']
+        except:
+            pass
     keywords_array = keywords.split()
     temp_dict['Keywords'] = keywords_array
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # Search for the "categories" metatag and add it into the output (In array structure)
+    categories = ""
+    for tag in meta_tags:
+        try:
+            if ("category" in tag['property'].lower()):
+                categories = categories + tag['content']
+            if ("categories" in tag['property'].lower()):
+                categories = categories + tag['content']
+        except:
+            pass
+        try:
+            if ("category" in tag['name'].lower()):
+                categories = categories + tag['content']
+            if ("categories" in tag['name'].lower()):
+                categories = categories + tag['content']
+        except:
+            pass
+    categories_array = categories.split()
+    temp_dict['Categories'] = categories_array
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # Search for the first "description" metatag and add it into the output
+    description = "NIL"
+    for tag in meta_tags:
+        try:
+            if ("title" in tag['property'].lower()):
+                title = tag['content']
+                break
+            if ("title" in tag['name'].lower()):
+                title = tag['content']
+                break
+        except:
+            pass
+    temp_dict['Title'] = title
     # ----------------------------------------------------------
 
     property_text = "\n\033[1mPROPERTY-TAGS \033[0m"
@@ -132,7 +176,7 @@ for site in df.iloc[:, 0]:
                 print('\nName: ' + content.get("name", None) +
                       " --> " + content['content'])
                 stored_text += '\n' + content['content']
-                tags_dict[content.get("property", None)] = content['content']
+                tags_dict[content.get("name", None)] = content['content']
         except:
             pass
 

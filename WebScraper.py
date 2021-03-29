@@ -25,16 +25,12 @@ for site in df.iloc[:, 0]:
     stored_text = ''
     user_input = ''
     temp_dict = {}
-    tags_dict = {}
-    tags_array = []
 
     # while (website != 'exit') and (website != 'translate'):
     try:
         # user_input = input(
         #     "Please ensure that your link has \033[1m https:// \033[0m \n\n")
         website = str(site)  # str(user_input)
-        temp_dict['domain'] = url_parser.parse_url(site)['domain']
-        temp_dict['URL'] = website
         html_text = requests.get(website, headers={
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
         }).text
@@ -57,37 +53,21 @@ for site in df.iloc[:, 0]:
 
     # ----------------------------------------------------------
     # Pre-fill path with NIL string in the event there is no directory
-    temp_dict['Full-URL-Path'] = "NIL"
-    temp_dict['First-URL-Directory'] = "NIL"
-    temp_dict['Second-URL-Directory'] = "NIL"
+    temp_dict['topDomain'] = "NIL"
+    temp_dict['URL'] = "NIL"
     # ----------------------------------------------------------
 
     try:
         # ----------------------------------------------------------
-        # Get the full-URL path from the URL
-        print('\n\033[1mFULL-URL-DIRECTORY\033[0m')
-        print(url_parser.parse_url(site)['path'])
-        temp_dict['Full-URL-Path'] = url_parser.parse_url(site)['path']
+        # Get the top domain from the URL
+        temp_dict['topDomain'] = str(url_parser.parse_url(
+            site)['domain']) + str(url_parser.parse_url(site)['dir'])
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------
-        # Get first directory from URL
-        print('\n\033[1mFIRST-URL-DIRECTORY\033[0m')
-        category = url_parser.parse_url(site)['dir']
-        category = category[1:-1]
-        first_directory = category.split('/')[0]
-        print(first_directory)
-        temp_dict['First-URL-Directory'] = first_directory
+        # Get the top domain from the URL
+        temp_dict['URL'] = website
         # ----------------------------------------------------------
-
-        # ----------------------------------------------------------
-        # Get second directory from URL
-        print('\n\033[1mSECOND-URL-DIRECTORY\033[0m')
-        second_directory = category.split('/')[1]
-        print(second_directory)
-        temp_dict['Second-URL-Directory'] = second_directory
-        # ----------------------------------------------------------
-
     except:
         pass
 

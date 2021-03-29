@@ -109,9 +109,21 @@ for site in df.iloc[:, 0]:
     for tag in meta_tags:
         try:
             if ("keyword" in tag['property'].lower()):
-                keywords = keywords + tag['content']
+                keywords += tag['content']
+        except:
+            pass
+        try:
             if ("keyword" in tag['name'].lower()):
-                keywords = keywords + tag['content']
+                keywords += tag['content']
+        except:
+            pass
+
+    div_tags = soup.find_all("div")
+    for div_tag in div_tags:
+        try:
+            a_tags = div_tag.find_all("a", {"class": "tag-detail"})
+            for a in a_tags:
+                keywords += a.text
         except:
             pass
     keywords_array = keywords.split()
@@ -124,16 +136,27 @@ for site in df.iloc[:, 0]:
     for tag in meta_tags:
         try:
             if ("category" in tag['property'].lower()):
-                categories = categories + tag['content']
+                categories += tag['content']
+        except:
+            pass
+        try:
             if ("categories" in tag['property'].lower()):
-                categories = categories + tag['content']
+                categories += tag['content']
+        except:
+            pass
+        try:
+            if ("article:section" in tag['property'].lower()):
+                categories += tag['content']
         except:
             pass
         try:
             if ("category" in tag['name'].lower()):
-                categories = categories + tag['content']
+                categories += tag['content']
+        except:
+            pass
+        try:
             if ("categories" in tag['name'].lower()):
-                categories = categories + tag['content']
+                categories += tag['content']
         except:
             pass
     categories_array = categories.split()
@@ -145,15 +168,15 @@ for site in df.iloc[:, 0]:
     description = "NIL"
     for tag in meta_tags:
         try:
-            if ("title" in tag['property'].lower()):
-                title = tag['content']
+            if ("description" in tag['property'].lower()):
+                description = tag['content']
                 break
-            if ("title" in tag['name'].lower()):
-                title = tag['content']
+            if ("description" in tag['name'].lower()):
+                description = tag['content']
                 break
         except:
             pass
-    temp_dict['Title'] = title
+    temp_dict['Description'] = description
     # ----------------------------------------------------------
 
     property_text = "\n\033[1mPROPERTY-TAGS \033[0m"

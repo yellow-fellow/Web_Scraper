@@ -34,7 +34,7 @@ for site in df.iloc[:, 0]:
         html_text = requests.get(website, headers={
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
         }).text
-        clear_output(wait=True)
+        # clear_output(wait=True)
     except:
         pass  # continue
 
@@ -155,12 +155,15 @@ for site in df.iloc[:, 0]:
         try:
             if ("description" in tag['property'].lower()):
                 description = tag['content']
+                description = ' '.join(description.split())
                 break
             if ("description" in tag['name'].lower()):
                 description = tag['content']
+                description = ' '.join(description.split())
                 break
         except:
             pass
+
     temp_dict['Description'] = description
     # ----------------------------------------------------------
 

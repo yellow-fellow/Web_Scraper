@@ -10,6 +10,7 @@ import ipywidgets as widgets
 from google_trans_new import google_translator
 import json
 import pandas as pd
+import re
 
 translator = google_translator()
 
@@ -18,7 +19,7 @@ translator = google_translator()
 
 # ----------------------------------------------------------
 # Select excel sheet as input
-df = pd.read_excel('QA_test_5.xlsx')
+df = pd.read_excel('QA_test.xlsx')
 # ----------------------------------------------------------
 for site in df.iloc[:, 0]:
     website = ''
@@ -118,6 +119,8 @@ for site in df.iloc[:, 0]:
         except:
             pass
     keywords_array = keywords.split()
+    #keywords_array = re.split(', ', keywords)
+    keywords_array = list(dict.fromkeys(keywords_array))
     temp_dict['Keywords'] = keywords_array
     # ----------------------------------------------------------
 
@@ -151,6 +154,8 @@ for site in df.iloc[:, 0]:
         except:
             pass
     categories_array = categories.split()
+    #categories_array = re.split(', ', categories)
+    categories_array = list(dict.fromkeys(categories_array))
     temp_dict['Categories'] = categories_array
     # ----------------------------------------------------------
 

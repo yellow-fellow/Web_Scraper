@@ -18,7 +18,7 @@ translator = google_translator()
 
 # ----------------------------------------------------------
 # Select excel sheet as input
-df = pd.read_excel('QA_test.xlsx')
+df = pd.read_excel('QA_test_5.xlsx')
 # ----------------------------------------------------------
 for site in df.iloc[:, 0]:
     website = ''
@@ -79,6 +79,12 @@ for site in df.iloc[:, 0]:
         try:
             if ("title" in tag['property'].lower()):
                 title = tag['content']
+                title = ' '.join(title.split())
+                print(title)
+                title = title.encode("ascii", "ignore")
+                print(title)
+                title = title.decode("utf-8")
+                print(title)
                 break
         except:
             pass
@@ -156,15 +162,20 @@ for site in df.iloc[:, 0]:
             if ("description" in tag['property'].lower()):
                 description = tag['content']
                 description = ' '.join(description.split())
+                description = description.encode("ascii", "ignore")
+                description = description.decode("utf-8")
                 break
             if ("description" in tag['name'].lower()):
                 description = tag['content']
                 description = ' '.join(description.split())
+                description = description.encode("ascii", "ignore")
+                description = description.decode("utf-8")
                 break
         except:
             pass
 
     temp_dict['Description'] = description
+    print()
     # ----------------------------------------------------------
 
     # ----------------------------------------------------------

@@ -18,7 +18,7 @@ translator = google_translator()
 
 # ----------------------------------------------------------
 # Select excel sheet as input
-df = pd.read_excel('QA_test.xlsx')
+df = pd.read_excel('QA_test_2.xlsx')
 # ----------------------------------------------------------
 for site in df.iloc[:, 0]:
     website = ''
@@ -60,8 +60,11 @@ for site in df.iloc[:, 0]:
     try:
         # ----------------------------------------------------------
         # Get the top domain from the URL
+        category = url_parser.parse_url(site)['dir']
         temp_dict['topDomain'] = str(url_parser.parse_url(
-            site)['domain']) + str(url_parser.parse_url(site)['dir'])
+            site)['sub_domain']) + str(url_parser.parse_url(
+                site)['domain']) + "." + str(url_parser.parse_url(
+                    site)['top_domain']) + "/" + str(category.split('/')[1])
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------

@@ -19,7 +19,7 @@ translator = google_translator()
 
 # ----------------------------------------------------------
 # Select excel sheet as input
-df = pd.read_excel('QA_test.xlsx')
+df = pd.read_excel('QA_test_6.xlsx')
 # ----------------------------------------------------------
 for site in df.iloc[:, 0]:
     website = ''
@@ -118,6 +118,7 @@ for site in df.iloc[:, 0]:
                 keywords += " " + a.text
         except:
             pass
+    keywords = keywords.replace(",", " ")
     keywords_array = keywords.split()
     #keywords_array = re.split(', ', keywords)
     keywords_array = list(dict.fromkeys(keywords_array))
@@ -185,7 +186,7 @@ for site in df.iloc[:, 0]:
 
     # ----------------------------------------------------------
     # Write data into JSON file
-    with open('QA_test.json', 'a') as outfile:
+    with open('QA_test_2.json', 'a') as outfile:
         json.dump(temp_dict, outfile)
         outfile.write('\n')
     # ----------------------------------------------------------

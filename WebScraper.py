@@ -1,7 +1,8 @@
 # In[]
 # ----------------------------------------------------------
 # Import libraries
-
+import csv
+from smart_open import open
 from bs4 import BeautifulSoup
 import url_parser
 import requests
@@ -11,9 +12,28 @@ from google_trans_new import google_translator
 import json
 import pandas as pd
 import re
+import os
+import boto3
+from io import StringIO
 
 translator = google_translator()
 
+client = boto3.client('s3')
+s3_bucket = 'shaohang-development'
+empty_array = []
+for key in client.list_objects(Bucket=s3_bucket, Prefix='dmp2')['Contents']:
+    print(key['Key'])
+    value = key['Key']
+    try:
+        with open(f's3://{s3_bucket}/{value}', 'r') as f:
+            reader = csv.reader(f)
+            for line in reader:
+                empty_array.append(line)
+                print(f'[Processing line] {line}')
+    except:
+        pass
+
+"""
 # ----------------------------------------------------------
 # In[15]
 
@@ -217,3 +237,4 @@ for site in df.iloc[:, 0]:
     # ----------------------------------------------------------
 
 # %%
+"""

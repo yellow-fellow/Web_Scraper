@@ -19,7 +19,7 @@ translator = google_translator()
 
 # ----------------------------------------------------------
 # Select excel sheet as input
-df = pd.read_excel('QA_test_6.xlsx')
+df = pd.read_csv('QA_test_2.csv')
 # ----------------------------------------------------------
 for site in df.iloc[:, 0]:
     website = ''
@@ -55,7 +55,6 @@ for site in df.iloc[:, 0]:
     # ----------------------------------------------------------
     # Pre-fill path with NIL string in the event there is no directory
     temp_dict['topDomain'] = "NIL"
-    temp_dict['URL'] = "NIL"
     # ----------------------------------------------------------
 
     try:
@@ -66,64 +65,8 @@ for site in df.iloc[:, 0]:
         temp_dict['topDomain'] = site[8:second_index]
         # ----------------------------------------------------------
 
-        # ----------------------------------------------------------
-        # Get the top domain from the URL
-        temp_dict['URL'] = website
-        # ----------------------------------------------------------
     except:
         pass
-
-    # ----------------------------------------------------------
-    # Search for the first "title" metatag and add it into the output
-    title = "NIL"
-    for tag in meta_tags:
-        try:
-            if ("title" in tag['property'].lower()):
-                title = tag['content']
-                title = ' '.join(title.split())
-                print(title)
-                title = title.encode("ascii", "ignore")
-                print(title)
-                title = title.decode("utf-8")
-                print(title)
-                break
-        except:
-            pass
-    temp_dict['Title'] = title
-    # ----------------------------------------------------------
-
-    # ----------------------------------------------------------
-    # Search for the "keywords" metatag and add it into the output (In array structure)
-    keywords = ""
-    for tag in meta_tags:
-        try:
-            if ("keyword" in tag['property'].lower()):
-                keywords += " " + tag['content']
-        except:
-            pass
-        try:
-            if ("keyword" in tag['name'].lower()):
-                keywords += " " + tag['content']
-        except:
-            pass
-
-    # See if can use css-selector instead.
-    # a_tags = soup.find_all("div > a")
-    # may be lazy loading
-    div_tags = soup.find_all("div")
-    for div_tag in div_tags:
-        try:
-            a_tags = div_tag.find_all("a", {"class": "tag-detail"})
-            for a in a_tags:
-                keywords += " " + a.text
-        except:
-            pass
-    keywords = keywords.replace(",", " ")
-    keywords_array = keywords.split()
-    #keywords_array = re.split(', ', keywords)
-    keywords_array = list(dict.fromkeys(keywords_array))
-    temp_dict['Keywords'] = keywords_array
-    # ----------------------------------------------------------
 
     # ----------------------------------------------------------
     # Search for the "categories" metatag and add it into the output (In array structure)
@@ -161,6 +104,55 @@ for site in df.iloc[:, 0]:
     # ----------------------------------------------------------
 
     # ----------------------------------------------------------
+    # Search for the "keywords" metatag and add it into the output (In array structure)
+    keywords = ""
+    for tag in meta_tags:
+        try:
+            if ("keyword" in tag['property'].lower()):
+                keywords += " " + tag['content']
+        except:
+            pass
+        try:
+            if ("keyword" in tag['name'].lower()):
+                keywords += " " + tag['content']
+        except:
+            pass
+
+    # See if can use css-selector instead.
+    # a_tags = soup.find_all("div > a")
+    # may be lazy loading
+    div_tags = soup.find_all("div")
+    for div_tag in div_tags:
+        try:
+            a_tags = div_tag.find_all("a", {"class": "tag-detail"})
+            for a in a_tags:
+                keywords += " " + a.text
+        except:
+            pass
+    keywords = keywords.replace(",", " ")
+    keywords_array = keywords.split()
+    #keywords_array = re.split(', ', keywords)
+    keywords_array = list(dict.fromkeys(keywords_array))
+    temp_dict['Keywords'] = keywords_array
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # Search for the first "title" metatag and add it into the output
+    title = "NIL"
+    for tag in meta_tags:
+        try:
+            if ("title" in tag['property'].lower()):
+                title = tag['content']
+                title = ' '.join(title.split())
+                title = title.encode("ascii", "ignore")
+                title = title.decode("utf-8")
+                break
+        except:
+            pass
+    temp_dict['Title'] = title
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
     # Search for the first "description" metatag and add it into the output
     description = "NIL"
     for tag in meta_tags:
@@ -181,23 +173,47 @@ for site in df.iloc[:, 0]:
             pass
 
     temp_dict['Description'] = description
-    print()
+    # ----------------------------------------------------------
+
+    temp_dict['URL'] = "NIL"
+    try:
+        # ----------------------------------------------------------
+        # Get the full URL
+        temp_dict['URL'] = website
+        # ----------------------------------------------------------
+    except:
+        pass
+
+    # ----------------------------------------------------------
+    # Translate Title & Description
+    gt_title = translator.translate(title, lang_tgt='en')
+    temp_dict['gt_Title'] = gt_title
+
+    gt_description = translator.translate(description, lang_tgt='en')
+    temp_dict['gt_Description'] = gt_description
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # Try finding published date
+    # PublishedDate = "NIL"
+    # for tag in meta_tags:
+    #     try:
+    #         if ("date" in tag['property'].lower()):
+    #             print(tag['content'])
+    #             # title = tag['content']
+    #             # title = ' '.join(title.split())
+    #             # title = title.encode("ascii", "ignore")
+    #             # title = title.decode("utf-8")
+    #             break
+    #     except:
+    #         pass
     # ----------------------------------------------------------
 
     # ----------------------------------------------------------
     # Write data into JSON file
-    with open('QA_test_2.json', 'a') as outfile:
+    with open('QA_test.json', 'a') as outfile:
         json.dump(temp_dict, outfile)
         outfile.write('\n')
     # ----------------------------------------------------------
 
-    if (website == 'translate'):
-        print("\n\033[1mTRANSLATED-TEXT\033[0m")
-        translate_text = translator.translate(stored_text, lang_tgt='en')
-        print('\n' + translate_text)
-
-# %%
-requests.get("https://bolastylo.bolasport.com/read", headers={
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
-})
 # %%

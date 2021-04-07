@@ -15,6 +15,7 @@ import re
 import os
 import boto3
 from io import StringIO
+import time
 
 translator = google_translator()
 
@@ -95,6 +96,9 @@ def readCSV(csvFile):
                     categories += " " + tag['content']
             except:
                 pass
+
+        categories = categories.encode("ascii", "ignore")
+        categories = categories.decode("utf-8")
         categories_array = categories.split()
         #categories_array = re.split(', ', categories)
         categories_array = list(dict.fromkeys(categories_array))
@@ -128,6 +132,8 @@ def readCSV(csvFile):
             except:
                 pass
         keywords = keywords.replace(",", " ")
+        keywords = keywords.encode("ascii", "ignore")
+        keywords = keywords.decode("utf-8")
         keywords_array = keywords.split()
         #keywords_array = re.split(', ', keywords)
         keywords_array = list(dict.fromkeys(keywords_array))
@@ -182,30 +188,23 @@ def readCSV(csvFile):
         except:
             pass
 
-        # ----------------------------------------------------------
-        # Translate Title & Description
-        gt_title = translator.translate(title, lang_tgt='en')
+        gt_title = "NIL"
         temp_dict['gt_Title'] = gt_title
 
-        gt_description = translator.translate(description, lang_tgt='en')
+        gt_description = "NIL"
         temp_dict['gt_Description'] = gt_description
-        # ----------------------------------------------------------
 
-        # ----------------------------------------------------------
-        # Try finding published date
-        # PublishedDate = "NIL"
-        # for tag in meta_tags:
-        #     try:
-        #         if ("date" in tag['property'].lower()):
-        #             print(tag['content'])
-        #             # title = tag['content']
-        #             # title = ' '.join(title.split())
-        #             # title = title.encode("ascii", "ignore")
-        #             # title = title.decode("utf-8")
-        #             break
-        #     except:
-        #         pass
-        # ----------------------------------------------------------
+        try:
+            # ----------------------------------------------------------
+            # Translate Title & Description
+            gt_title = translator.translate(title, lang_tgt='en')
+            temp_dict['gt_Title'] = gt_title
+
+            gt_description = translator.translate(description, lang_tgt='en')
+            temp_dict['gt_Description'] = gt_description
+            # ----------------------------------------------------------
+        except:
+            pass
 
         # ----------------------------------------------------------
         # Write data into JSON file
@@ -219,12 +218,20 @@ def readCSV(csvFile):
 # Read and combine all CSVs in a bucket
 client = boto3.client('s3')
 s3_bucket = 'shaohang-development'
-empty_array = []
-for key in client.list_objects(Bucket=s3_bucket, Prefix='dmp2')['Contents']:
+
+'''for key in client.list_objects(Bucket=s3_bucket, Prefix='dmp2')['Contents']:
     value = key['Key']
     try:
         with open(f's3://{s3_bucket}/{value}', 'r') as f:
             readCSV(f)
     except:
-        pass
+        pass'''
+
+
+start_time = time.time()
+with open('QA_test_7.csv') as csvfile:
+    readCSV(csvfile)
+print("--- %s seconds ---" % (time.time() - start_time))
 # ----------------------------------------------------------
+
+# %%

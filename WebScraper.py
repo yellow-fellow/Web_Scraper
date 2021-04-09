@@ -33,17 +33,13 @@ def readCSV(csvFile):
         website = ''
         temp_dict = {}
 
-        # while (website != 'exit') and (website != 'translate'):
         try:
-            # user_input = input(
-            #     "Please ensure that your link has \033[1m https:// \033[0m \n\n")
             website = str(site)  # str(user_input)
             html_text = requests.get(website, headers={
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
             }).text
-            # clear_output(wait=True)
         except:
-            pass  # continue
+            pass
 
         try:
             soup = BeautifulSoup(html_text, 'lxml')
@@ -53,7 +49,7 @@ def readCSV(csvFile):
 
         # ----------------------------------------------------------
         # Pre-fill path with NIL string in the event there is no directory
-        temp_dict['topDomain'] = "NIL"
+        temp_dict['top_domain'] = "NIL"
         # ----------------------------------------------------------
 
         try:
@@ -61,7 +57,7 @@ def readCSV(csvFile):
             # Get the top domain from the URL
             first_index = site.find('/', 8)
             second_index = site.find('/', first_index + 1)
-            temp_dict['topDomain'] = site[8:second_index]
+            temp_dict['top_domain'] = {"S": site[8:second_index]}
             # ----------------------------------------------------------
 
         except:
@@ -102,7 +98,7 @@ def readCSV(csvFile):
         categories_array = categories.split()
         #categories_array = re.split(', ', categories)
         categories_array = list(dict.fromkeys(categories_array))
-        temp_dict['Categories'] = categories_array
+        temp_dict['categories'] = {"L": categories_array}
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------
@@ -137,7 +133,7 @@ def readCSV(csvFile):
         keywords_array = keywords.split()
         #keywords_array = re.split(', ', keywords)
         keywords_array = list(dict.fromkeys(keywords_array))
-        temp_dict['Keywords'] = keywords_array
+        temp_dict['keywords'] = {"L": keywords_array}
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------
@@ -153,7 +149,7 @@ def readCSV(csvFile):
                     break
             except:
                 pass
-        temp_dict['Title'] = title
+        temp_dict['title'] = {"S": title}
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------
@@ -176,32 +172,32 @@ def readCSV(csvFile):
             except:
                 pass
 
-        temp_dict['Description'] = description
+        temp_dict['description'] = {"S": description}
         # ----------------------------------------------------------
 
-        temp_dict['URL'] = "NIL"
+        temp_dict['url'] = "NIL"
         try:
             # ----------------------------------------------------------
             # Get the full URL
-            temp_dict['URL'] = website
+            temp_dict['url'] = website
             # ----------------------------------------------------------
         except:
             pass
 
         gt_title = "NIL"
-        temp_dict['gt_Title'] = gt_title
+        temp_dict['gt_title'] = {"S": gt_title}
 
         gt_description = "NIL"
-        temp_dict['gt_Description'] = gt_description
+        temp_dict['gt_description'] = {"S": gt_description}
 
         try:
             # ----------------------------------------------------------
             # Translate Title & Description
             gt_title = translator.translate(title, lang_tgt='en')
-            temp_dict['gt_Title'] = gt_title
+            temp_dict['gt_title'] = {"S": gt_title}
 
             gt_description = translator.translate(description, lang_tgt='en')
-            temp_dict['gt_Description'] = gt_description
+            temp_dict['gt_description'] = {"S": gt_description}
             # ----------------------------------------------------------
         except:
             pass
@@ -227,6 +223,24 @@ s3_bucket = 'shaohang-development'
     except:
         pass'''
 
+
+# # ----------------------------------------------------------
+# # DynamoDB
+
+# # Table Name
+# table_name = 'scrapy'
+
+# # Client
+# dynamodb_client = boto3.client("dynamodb")
+
+# # Example Record
+# record = {"url": {'S': "https://20.detik.com/detikflash/20210326-210326059/menko-pmk-cuti-bersama-idul-fitri-tetap-ada-tapi-tak-boleh-mudik"}}
+
+# if __name__ == "__main__":
+#     dynamodb_client.put_item(TableName=table_name, Item=record)
+
+# # ----------------------------------------------------------
+# ----------------------------------------------------------
 
 start_time = time.time()
 with open('QA_test_7.csv') as csvfile:

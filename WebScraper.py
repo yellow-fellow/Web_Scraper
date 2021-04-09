@@ -22,6 +22,15 @@ translator = google_translator()
 # ----------------------------------------------------------
 # In[15]
 
+# ----------------------------------------------------------
+
+
+def ddb_upload(table_name, record):
+    # DynamoDB
+
+    dynamodb_client.put_item(TableName=table_name, Item=record)
+# ----------------------------------------------------------
+
 
 def readCSV(csvFile):
 
@@ -65,7 +74,7 @@ def readCSV(csvFile):
 
         # ----------------------------------------------------------
         # Search for the "categories" metatag and add it into the output (In array structure)
-        categories = ""
+        categories = "NIL"
         for tag in meta_tags:
             try:
                 if ("category" in tag['property'].lower()):
@@ -98,12 +107,12 @@ def readCSV(csvFile):
         categories_array = categories.split()
         #categories_array = re.split(', ', categories)
         categories_array = list(dict.fromkeys(categories_array))
-        temp_dict['categories'] = {"L": categories_array}
+        temp_dict['categories'] = {"SS": categories_array}
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------
         # Search for the "keywords" metatag and add it into the output (In array structure)
-        keywords = ""
+        keywords = "NIL"
         for tag in meta_tags:
             try:
                 if ("keyword" in tag['property'].lower()):
@@ -133,7 +142,7 @@ def readCSV(csvFile):
         keywords_array = keywords.split()
         #keywords_array = re.split(', ', keywords)
         keywords_array = list(dict.fromkeys(keywords_array))
-        temp_dict['keywords'] = {"L": keywords_array}
+        temp_dict['keywords'] = {"SS": keywords_array}
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------
@@ -175,11 +184,11 @@ def readCSV(csvFile):
         temp_dict['description'] = {"S": description}
         # ----------------------------------------------------------
 
-        temp_dict['url'] = "NIL"
+        temp_dict['url'] = {"S": "NIL"}
         try:
             # ----------------------------------------------------------
             # Get the full URL
-            temp_dict['url'] = website
+            temp_dict['url'] = {"S": website}
             # ----------------------------------------------------------
         except:
             pass
@@ -209,13 +218,17 @@ def readCSV(csvFile):
             outfile.write('\n')
         # ----------------------------------------------------------
 
+        # ----------------------------------------------------------
+        ddb_upload(table_name, temp_dict)
+        # ----------------------------------------------------------
+
 
 # ----------------------------------------------------------
-# Read and combine all CSVs in a bucket
-client = boto3.client('s3')
+# Read and combine all CSVs in a bucket & output in a JSON file
+s3_client = boto3.client('s3')
 s3_bucket = 'shaohang-development'
 
-'''for key in client.list_objects(Bucket=s3_bucket, Prefix='dmp2')['Contents']:
+'''for key in s3_client.list_objects(Bucket=s3_bucket, Prefix='dmp2')['Contents']:
     value = key['Key']
     try:
         with open(f's3://{s3_bucket}/{value}', 'r') as f:
@@ -225,27 +238,24 @@ s3_bucket = 'shaohang-development'
 
 
 # # ----------------------------------------------------------
-# # DynamoDB
 
-# # Table Name
-# table_name = 'scrapy'
+if __name__ == "__main__":
 
-# # Client
-# dynamodb_client = boto3.client("dynamodb")
+    # ----------------------------------------------------------
+    # DynamoDB
+    # Client
+    dynamodb_client = boto3.client("dynamodb")
 
-# # Example Record
-# record = {"url": {'S': "https://20.detik.com/detikflash/20210326-210326059/menko-pmk-cuti-bersama-idul-fitri-tetap-ada-tapi-tak-boleh-mudik"}}
+    # Table Name
+    table_name = 'scrapy'
 
-# if __name__ == "__main__":
-#     dynamodb_client.put_item(TableName=table_name, Item=record)
+    # ----------------------------------------------------------
 
-# # ----------------------------------------------------------
-# ----------------------------------------------------------
-
-start_time = time.time()
-with open('QA_test_7.csv') as csvfile:
-    readCSV(csvfile)
-print("--- %s seconds ---" % (time.time() - start_time))
-# ----------------------------------------------------------
+    # ----------------------------------------------------------
+    # start_time = time.time()
+    with open('QA_test_7.csv') as csvfile:
+        readCSV(csvfile)
+    print("--- %s seconds ---" % (time.time() - start_time))
+    # ----------------------------------------------------------
 
 # %%

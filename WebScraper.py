@@ -27,7 +27,6 @@ translator = google_translator()
 
 def ddb_upload(table_name, record):
     # DynamoDB
-
     dynamodb_client.put_item(TableName=table_name, Item=record)
 # ----------------------------------------------------------
 

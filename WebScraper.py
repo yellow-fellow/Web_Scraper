@@ -32,6 +32,17 @@ def ddb_upload(table_name, record):
 # ----------------------------------------------------------
 
 
+def exists(site):
+    try:
+        response = table.get_item(Key={'url': site})
+        item = response['Item']
+        return item
+    except:
+        item = None
+        print(item)
+        return item
+
+
 def readCSV(csvFile):
 
     # ----------------------------------------------------------
@@ -55,6 +66,28 @@ def readCSV(csvFile):
             meta_tags = soup.find_all('meta')
         except:
             continue
+
+        if exists(website):
+            temp_dict = exists(website)
+            # temp_dict['top_domain'] = {"S": ddb_dict['top_domain']}
+            # temp_dict['categories'] = {"SS": ddb_dict['categories']}
+            # temp_dict['keywords'] = {"SS": ddb_dict['keywords']}
+            # temp_dict['title'] = {"S": ddb_dict['title']}
+            # temp_dict['description'] = {"S": ddb_dict['description']}
+            # temp_dict['url'] = {"S": ddb_dict['url']}
+            # temp_dict['gt_title'] = {"S": ddb_dict['gt_title']}
+            # temp_dict['gt_description'] = {"S": ddb_dict['gt_description']}
+            print(temp_dict)
+            print(' ')
+            # ----------------------------------------------------------
+            # Write data into JSON file
+            with open('QA_test.json', 'a') as outfile:
+                json.dump(temp_dict, outfile)
+                outfile.write('\n')
+            # ----------------------------------------------------------
+            break
+        else:
+            break
 
         # ----------------------------------------------------------
         # Pre-fill path with NIL string in the event there is no directory
@@ -223,23 +256,8 @@ def readCSV(csvFile):
         # ----------------------------------------------------------
 
 
-# ----------------------------------------------------------
-# Read and combine all CSVs in a bucket & output in a JSON file
-s3_client = boto3.client('s3')
-s3_bucket = 'shaohang-development'
-
-'''for key in s3_client.list_objects(Bucket=s3_bucket, Prefix='dmp2')['Contents']:
-    value = key['Key']
-    try:
-        with open(f's3://{s3_bucket}/{value}', 'r') as f:
-            readCSV(f)
-    except:
-        pass'''
-
-
-# # ----------------------------------------------------------
-
 if __name__ == "__main__":
+    start_time = time.time()
 
     # ----------------------------------------------------------
     # DynamoDB
@@ -249,13 +267,29 @@ if __name__ == "__main__":
     # Table Name
     table_name = 'scrapy'
 
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(table_name)
     # ----------------------------------------------------------
 
     # ----------------------------------------------------------
-    # start_time = time.time()
-    with open('QA_test_7.csv') as csvfile:
-        readCSV(csvfile)
-    print("--- %s seconds ---" % (time.time() - start_time))
+    # Read and combine all CSVs in a bucket & output in a JSON file
+    s3_client = boto3.client('s3')
+    s3_bucket = 'shaohang-development'
+
+    for key in s3_client.list_objects(Bucket=s3_bucket, Prefix='dmp2')['Contents']:
+        value = key['Key']
+        try:
+            with open(f's3://{s3_bucket}/{value}', 'r') as f:
+                readCSV(f)
+        except:
+            pass
+
     # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # with open('QA_test_7.csv') as csvfile:
+    #     readCSV(csvfile)
+    # ----------------------------------------------------------
+    print("--- %s seconds ---" % (time.time() - start_time))
 
 # %%

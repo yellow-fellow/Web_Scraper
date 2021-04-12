@@ -39,7 +39,6 @@ def exists(site):
         return item
     except:
         item = None
-        print(item)
         return item
 
 
@@ -68,17 +67,25 @@ def readCSV(csvFile):
             continue
 
         if exists(website):
-            temp_dict = exists(website)
-            # temp_dict['top_domain'] = {"S": ddb_dict['top_domain']}
-            # temp_dict['categories'] = {"SS": ddb_dict['categories']}
-            # temp_dict['keywords'] = {"SS": ddb_dict['keywords']}
-            # temp_dict['title'] = {"S": ddb_dict['title']}
-            # temp_dict['description'] = {"S": ddb_dict['description']}
-            # temp_dict['url'] = {"S": ddb_dict['url']}
-            # temp_dict['gt_title'] = {"S": ddb_dict['gt_title']}
-            # temp_dict['gt_description'] = {"S": ddb_dict['gt_description']}
-            print(temp_dict)
-            print(' ')
+            ddb_dict = exists(website)
+            temp_dict['top_domain'] = {"S": ddb_dict['top_domain']}
+
+            temp_categories = []
+            for category in ddb_dict['categories']:
+                temp_categories.append(category)
+            temp_dict['categories'] = {"SS": temp_categories}
+
+            temp_keywords = []
+            for keyword in ddb_dict['keywords']:
+                temp_keywords.append(keyword)
+            temp_dict['keywords'] = {"SS": temp_keywords}
+
+            temp_dict['title'] = {"S": ddb_dict['title']}
+            temp_dict['description'] = {"S": ddb_dict['description']}
+            temp_dict['url'] = {"S": ddb_dict['url']}
+            temp_dict['gt_title'] = {"S": ddb_dict['gt_title']}
+            temp_dict['gt_description'] = {"S": ddb_dict['gt_description']}
+
             # ----------------------------------------------------------
             # Write data into JSON file
             with open('QA_test.json', 'a') as outfile:
@@ -138,7 +145,7 @@ def readCSV(csvFile):
         categories = categories.encode("ascii", "ignore")
         categories = categories.decode("utf-8")
         categories_array = categories.split()
-        #categories_array = re.split(', ', categories)
+        # categories_array = re.split(', ', categories)
         categories_array = list(dict.fromkeys(categories_array))
         temp_dict['categories'] = {"SS": categories_array}
         # ----------------------------------------------------------
@@ -173,7 +180,7 @@ def readCSV(csvFile):
         keywords = keywords.encode("ascii", "ignore")
         keywords = keywords.decode("utf-8")
         keywords_array = keywords.split()
-        #keywords_array = re.split(', ', keywords)
+        # keywords_array = re.split(', ', keywords)
         keywords_array = list(dict.fromkeys(keywords_array))
         temp_dict['keywords'] = {"SS": keywords_array}
         # ----------------------------------------------------------

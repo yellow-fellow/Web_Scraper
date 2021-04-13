@@ -91,9 +91,9 @@ def readCSV(csvFile):
                 json.dump(temp_dict, outfile)
                 outfile.write('\n')
             # ----------------------------------------------------------
-            break
+            continue
         else:
-            break
+            continue
 
         # ----------------------------------------------------------
         # Pre-fill path with NIL string in the event there is no directory

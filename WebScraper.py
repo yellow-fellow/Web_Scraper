@@ -16,6 +16,7 @@ import os
 import boto3
 from io import StringIO
 import time
+from datetime import date
 
 translator = google_translator()
 
@@ -87,13 +88,13 @@ def readCSV(csvFile):
 
             # ----------------------------------------------------------
             # Write data into JSON file
-            with open('QA_test.json', 'a') as outfile:
+            with open('QA_test_2Ar.json', 'a') as outfile:
                 json.dump(temp_dict, outfile)
                 outfile.write('\n')
             # ----------------------------------------------------------
             continue
         else:
-            continue
+            pass
 
         # ----------------------------------------------------------
         # Pre-fill path with NIL string in the event there is no directory
@@ -164,9 +165,6 @@ def readCSV(csvFile):
             except:
                 pass
 
-        # See if can use css-selector instead.
-        # a_tags = soup.find_all("div > a")
-        # may be lazy loading
         div_tags = soup.find_all("div")
         for div_tag in div_tags:
             try:
@@ -251,6 +249,11 @@ def readCSV(csvFile):
             pass
 
         # ----------------------------------------------------------
+        # Date of scraping website
+        temp_dict['date'] = str(date.today())
+        # ----------------------------------------------------------
+
+        # ----------------------------------------------------------
         # Write data into JSON file
         with open('QA_test.json', 'a') as outfile:
             json.dump(temp_dict, outfile)
@@ -293,6 +296,7 @@ if __name__ == "__main__":
     # ----------------------------------------------------------
 
     # ----------------------------------------------------------
+    # Testing for single CSV file
     # with open('QA_test_7.csv') as csvfile:
     #     readCSV(csvfile)
     # ----------------------------------------------------------

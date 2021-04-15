@@ -68,29 +68,31 @@ def readCSV(csvFile):
 
         if exists(website):
             ddb_dict = exists(website)
-            temp_dict['top_domain'] = {"S": ddb_dict['top_domain']}
+
+            temp_dict['0_top_domain'] = {"S": ddb_dict['0_top_domain']}
 
             temp_categories = []
-            for category in ddb_dict['categories']:
+            for category in ddb_dict['1_categories']:
                 temp_categories.append(category)
-            temp_dict['categories'] = {"SS": temp_categories}
+            temp_dict['1_categories'] = {"SS": temp_categories}
 
             temp_keywords = []
-            for keyword in ddb_dict['keywords']:
+            for keyword in ddb_dict['2_keywords']:
                 temp_keywords.append(keyword)
-            temp_dict['keywords'] = {"SS": temp_keywords}
+            temp_dict['2_keywords'] = {"SS": temp_keywords}
 
-            temp_dict['title'] = {"S": ddb_dict['title']}
-            temp_dict['description'] = {"S": ddb_dict['description']}
+            temp_dict['3_title'] = {"S": ddb_dict['3_title']}
+            temp_dict['4_description'] = {"S": ddb_dict['4_description']}
             temp_dict['url'] = {"S": ddb_dict['url']}
-            temp_dict['gt_title'] = {"S": ddb_dict['gt_title']}
-            temp_dict['gt_description'] = {"S": ddb_dict['gt_description']}
+            temp_dict['5_gt_title'] = {"S": ddb_dict['5_gt_title']}
+            temp_dict['6_gt_description'] = {"S": ddb_dict['6_gt_description']}
+            temp_dict['7_date'] = {"S": str(date.today())}
 
             # ----------------------------------------------------------
             # Write data into JSON file
-            with open('QA_test_2Ar.json', 'a') as outfile:
-                json.dump(temp_dict, outfile)
-                outfile.write('\n')
+            # with open('QA_test.json', 'a') as outfile:
+            #     json.dump(temp_dict, outfile)
+            #     outfile.write('\n')
             # ----------------------------------------------------------
             continue
         else:
@@ -98,7 +100,7 @@ def readCSV(csvFile):
 
         # ----------------------------------------------------------
         # Pre-fill path with NIL string in the event there is no directory
-        temp_dict['top_domain'] = "NIL"
+        temp_dict['0_top_domain'] = "NIL"
         # ----------------------------------------------------------
 
         try:
@@ -106,7 +108,7 @@ def readCSV(csvFile):
             # Get the top domain from the URL
             first_index = site.find('/', 8)
             second_index = site.find('/', first_index + 1)
-            temp_dict['top_domain'] = {"S": site[8:second_index]}
+            temp_dict['0_top_domain'] = {"S": site[8:second_index]}
             # ----------------------------------------------------------
 
         except:
@@ -147,7 +149,7 @@ def readCSV(csvFile):
         categories_array = categories.split()
         # categories_array = re.split(', ', categories)
         categories_array = list(dict.fromkeys(categories_array))
-        temp_dict['categories'] = {"SS": categories_array}
+        temp_dict['1_categories'] = {"SS": categories_array}
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------
@@ -179,7 +181,7 @@ def readCSV(csvFile):
         keywords_array = keywords.split()
         # keywords_array = re.split(', ', keywords)
         keywords_array = list(dict.fromkeys(keywords_array))
-        temp_dict['keywords'] = {"SS": keywords_array}
+        temp_dict['2_keywords'] = {"SS": keywords_array}
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------
@@ -195,7 +197,7 @@ def readCSV(csvFile):
                     break
             except:
                 pass
-        temp_dict['title'] = {"S": title}
+        temp_dict['3_title'] = {"S": title}
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------
@@ -218,7 +220,7 @@ def readCSV(csvFile):
             except:
                 pass
 
-        temp_dict['description'] = {"S": description}
+        temp_dict['4_description'] = {"S": description}
         # ----------------------------------------------------------
 
         temp_dict['url'] = {"S": "NIL"}
@@ -231,33 +233,33 @@ def readCSV(csvFile):
             pass
 
         gt_title = "NIL"
-        temp_dict['gt_title'] = {"S": gt_title}
+        temp_dict['5_gt_title'] = {"S": gt_title}
 
         gt_description = "NIL"
-        temp_dict['gt_description'] = {"S": gt_description}
+        temp_dict['6_gt_description'] = {"S": gt_description}
 
         try:
             # ----------------------------------------------------------
             # Translate Title & Description
             gt_title = translator.translate(title, lang_tgt='en')
-            temp_dict['gt_title'] = {"S": gt_title}
+            temp_dict['5_gt_title'] = {"S": gt_title}
 
             gt_description = translator.translate(description, lang_tgt='en')
-            temp_dict['gt_description'] = {"S": gt_description}
+            temp_dict['6_gt_description'] = {"S": gt_description}
             # ----------------------------------------------------------
         except:
             pass
 
         # ----------------------------------------------------------
         # Date of scraping website
-        temp_dict['date'] = str(date.today())
+        temp_dict['7_date'] = {"S": str(date.today())}
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------
         # Write data into JSON file
-        with open('QA_test.json', 'a') as outfile:
-            json.dump(temp_dict, outfile)
-            outfile.write('\n')
+        # with open('QA_test.json', 'a') as outfile:
+        #     json.dump(temp_dict, outfile)
+        #     outfile.write('\n')
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------
@@ -290,9 +292,9 @@ if __name__ == "__main__":
         try:
             with open(f's3://{s3_bucket}/{value}', 'r') as f:
                 readCSV(f)
+            s3_client.delete_object(Bucket=s3_bucket, Key=value)
         except:
             pass
-
     # ----------------------------------------------------------
 
     # ----------------------------------------------------------

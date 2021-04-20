@@ -50,6 +50,17 @@ def exists(site):
         return item
 
 
+def ct_exists(temp_dict):
+    try:
+        response = ct_table.get_item(
+            Key={'domain': temp_dict['0_domain']['S'], 'path': temp_dict['1_path']['S']})
+        ct_item = response['Item']
+        print(ct_item['segments'])
+    except:
+        ct_item = None
+        print("Doesn't exist!")
+
+
 def excel_upload(temp_dict):
     excel_array = []
 
@@ -112,6 +123,8 @@ def readCSV(csvFile):
             temp_dict['6_gt_title'] = {"S": ddb_dict['6_gt_title']}
             temp_dict['7_gt_description'] = {"S": ddb_dict['7_gt_description']}
             temp_dict['8_date'] = {"S": str(date.today())}
+
+            ct_exists(temp_dict)
 
             # ----------------------------------------------------------
             # Write data into an array to push to google sheets
@@ -309,6 +322,11 @@ def readCSV(csvFile):
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------
+        # Check if data already exists in Contextual Targeting table
+        ct_exists(temp_dict)
+        # ----------------------------------------------------------
+
+        # ----------------------------------------------------------
         # Write data into JSON file
         # with open('QA_test.json', 'a') as outfile:
         #     json.dump(temp_dict, outfile)
@@ -324,15 +342,23 @@ if __name__ == "__main__":
     start_time = time.time()
 
     # ----------------------------------------------------------
-    # DynamoDB
+    # DynamoDB (Scrapy Table)
     # Client
     dynamodb_client = boto3.client("dynamodb")
 
     # Table Name
     table_name = 'scrapy'
-
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
+    # ----------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # DynamoDB (Contextual Targeting Table)
+    # Client
+
+    # Table Name
+    ct_table_name = 'contextual-targeting'
+    ct_table = dynamodb.Table(ct_table_name)
     # ----------------------------------------------------------
 
     # ----------------------------------------------------------

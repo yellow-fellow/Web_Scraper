@@ -24,9 +24,10 @@ scope = ['https://spreadsheets.google.com/feeds',
 creds = ServiceAccountCredentials.from_json_keyfile_name(
     'client_secret.json', scope)
 client = gspread.authorize(creds)
-
 sheet = client.open('scrapy').sheet1
 
+segments_list = ['female', 'avid-news-readers', 'celebrity', 'avid-political-news-readers', 'auto-enthusiasts', 'motocycle-enthusiasts', 'sports-fans', 'football-enthusiasts',
+                 'family', 'parenting', 'mobile-enthusiasts', 'consumer-electronics', 'business-professionals', 'beauty', 'fashion', 'movie', 'kids', 'education', 'shoppers']
 
 # ----------------------------------------------------------
 # In[15]
@@ -56,6 +57,7 @@ def ct_exists(temp_dict):
             Key={'domain': temp_dict['0_domain']['S'], 'path': temp_dict['1_path']['S']})
         ct_item = response['Item']
         print(ct_item['segments'])
+        return (ct_item['segments'])
     except:
         ct_item = None
         print("Doesn't exist!")
@@ -75,6 +77,14 @@ def excel_upload(temp_dict):
             excel_array.append(temp_str)
 
     sheet.append_row(excel_array)
+    excel_row = sheet.find(temp_dict['url']['S']).row
+    try:
+        existing_segments = ct_exists(temp_dict)
+        for segment in existing_segments:
+            positional_index = segments_list.index(segment)
+            sheet.update_cell(excel_row, 11 + positional_index, True)
+    except:
+        pass
 
 
 def readCSV(csvFile):
@@ -123,8 +133,6 @@ def readCSV(csvFile):
             temp_dict['6_gt_title'] = {"S": ddb_dict['6_gt_title']}
             temp_dict['7_gt_description'] = {"S": ddb_dict['7_gt_description']}
             temp_dict['8_date'] = {"S": str(date.today())}
-
-            ct_exists(temp_dict)
 
             # ----------------------------------------------------------
             # Write data into an array to push to google sheets
@@ -323,7 +331,6 @@ def readCSV(csvFile):
 
         # ----------------------------------------------------------
         # Check if data already exists in Contextual Targeting table
-        ct_exists(temp_dict)
         # ----------------------------------------------------------
 
         # ----------------------------------------------------------

@@ -1,6 +1,5 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-import pprint
 from urllib.parse import urlparse
 
 scope = ['https://spreadsheets.google.com/feeds',
@@ -13,10 +12,13 @@ sheet = client.open('scrapy').sheet1
 
 # scrapy = sheet.get_all_records()
 
-pp = pprint.PrettyPrinter(indent=4)
-# pp.pprint(scrapy)
+print(sheet.find('https://20.detik.com/detikflash/20210401-210401033/pria-yang-tendang-injak-wanita-keturunan-asia-di-as-ditangkap%3Ftag_from%3Dwp_belt_videoTerpopuler').col)
 
-test = "https://20.detik.com/detikflash/20210401-210401033/pria-yang-tendang-injak-wanita-keturunan-asia-di-as-ditangkap%3Ftag_from%3Dwp_belt_videoTerpopuler"
+temp_list = ['female', 'celebrity']
 
-print(urlparse(test)[1])
-print(urlparse(test)[2])
+counter = 11
+
+# for segment in temp_list:
+#     if segment in temp_list:
+#         sheet.update_cell(2, counter, True)
+#         counter += 1

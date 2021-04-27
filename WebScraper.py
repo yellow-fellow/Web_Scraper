@@ -17,6 +17,7 @@ import time
 from datetime import date
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import pprint
 
 translator = google_translator()
 scope = ['https://spreadsheets.google.com/feeds',
@@ -29,6 +30,7 @@ sheet = client.open('scrapy').sheet1
 segments_list = ['female', 'avid-news-readers', 'celebrity', 'avid-political-news-readers', 'auto-enthusiasts', 'motocycle-enthusiasts', 'sports-fans', 'football-enthusiasts',
                  'family', 'parenting', 'mobile-enthusiasts', 'consumer-electronics', 'business-professionals', 'beauty', 'fashion', 'movie', 'kids', 'education', 'shoppers']
 
+pp = pprint.PrettyPrinter(indent=4)
 # ----------------------------------------------------------
 # In[15]
 
@@ -56,11 +58,9 @@ def ct_exists(temp_dict):
         response = ct_table.get_item(
             Key={'domain': temp_dict['0_domain']['S'], 'path': temp_dict['1_path']['S']})
         ct_item = response['Item']
-        print(ct_item['segments'])
         return (ct_item['segments'])
     except:
         ct_item = None
-        print("Doesn't exist!")
 
 
 def excel_upload(temp_dict):
@@ -87,7 +87,7 @@ def excel_upload(temp_dict):
         pass
 
 
-def readCSV(csvFile):
+def readCSV(csvFile, user_input):
 
     # ----------------------------------------------------------
     # Select excel sheet as input
@@ -134,11 +134,13 @@ def readCSV(csvFile):
             temp_dict['7_gt_description'] = {"S": ddb_dict['7_gt_description']}
             temp_dict['8_date'] = {"S": str(date.today())}
 
-            # ----------------------------------------------------------
-            # Write data into an array to push to google sheets
-            excel_upload(temp_dict)
-            # ----------------------------------------------------------
-
+            if (user_input == 1):
+                # ----------------------------------------------------------
+                # Write data into an array to push to google sheets
+                excel_upload(temp_dict)
+                # ----------------------------------------------------------
+            else:
+                print(json.dumps(temp_dict, sort_keys=True, indent=4))
             # ----------------------------------------------------------
             # Write data into JSON file
             # with open('QA_test.json', 'a') as outfile:
@@ -174,7 +176,7 @@ def readCSV(csvFile):
         try:
             # ----------------------------------------------------------
             # Get the domain from the URL
-            path = urlparse(site)[2]
+            path = urlparse(site)[2][0: urlparse(site)[2].find('/', 1)]
             temp_dict['1_path'] = {"S": path}
             # ----------------------------------------------------------
 
@@ -324,14 +326,18 @@ def readCSV(csvFile):
         temp_dict['8_date'] = {"S": str(date.today())}
         # ----------------------------------------------------------
 
-        # ----------------------------------------------------------
-        # Write data into an array to push to google sheets
-        excel_upload(temp_dict)
-        # ----------------------------------------------------------
-
-        # ----------------------------------------------------------
-        # Check if data already exists in Contextual Targeting table
-        # ----------------------------------------------------------
+        user_input = input(
+            "Select 1 to upload data onto Google Spreadsheet. Select 2 to print out in console. \n")
+        if (user_input == 1):
+            # ----------------------------------------------------------
+            # Write data into an array to push to google sheets
+            excel_upload(temp_dict)
+            # ----------------------------------------------------------
+            # ----------------------------------------------------------
+            ddb_upload(table_name, temp_dict)
+            # ----------------------------------------------------------
+        else:
+            print(json.dumps(temp_dict, sort_keys=True, indent=4))
 
         # ----------------------------------------------------------
         # Write data into JSON file
@@ -340,12 +346,10 @@ def readCSV(csvFile):
         #     outfile.write('\n')
         # ----------------------------------------------------------
 
-        # ----------------------------------------------------------
-        ddb_upload(table_name, temp_dict)
-        # ----------------------------------------------------------
-
 
 if __name__ == "__main__":
+    user_input = input(
+        "Select 1 to upload data onto Google Spreadsheet. Select 2 to print out in console. \n")
     start_time = time.time()
 
     # ----------------------------------------------------------
@@ -377,7 +381,7 @@ if __name__ == "__main__":
         value = key['Key']
         try:
             with open(f's3://{s3_bucket}/{value}', 'r') as f:
-                readCSV(f)
+                readCSV(f, user_input)
             s3_client.delete_object(Bucket=s3_bucket, Key=value)
         except:
             pass

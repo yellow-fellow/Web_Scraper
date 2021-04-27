@@ -15,3 +15,6 @@ QA_test_2.json
 test.csv
 top3_pages_of_topdomains3_2021_04_12.csv
 client_secret.json
+test_code.py
+contextual-targeting.csv
+scrapy.csv

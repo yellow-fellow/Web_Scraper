@@ -9,15 +9,11 @@ import requests
 from google_trans_new import google_translator
 import json
 import pandas as pd
-import re
-import os
 import boto3
-from io import StringIO
 import time
 from datetime import date
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-import pprint
 
 translator = google_translator()
 scope = ['https://spreadsheets.google.com/feeds',
@@ -30,7 +26,6 @@ sheet = client.open('scrapy').sheet1
 segments_list = ['female', 'avid-news-readers', 'celebrity', 'avid-political-news-readers', 'auto-enthusiasts', 'motocycle-enthusiasts', 'sports-fans', 'football-enthusiasts',
                  'family', 'parenting', 'mobile-enthusiasts', 'consumer-electronics', 'business-professionals', 'beauty', 'fashion', 'movie', 'kids', 'education', 'shoppers']
 
-pp = pprint.PrettyPrinter(indent=4)
 # ----------------------------------------------------------
 # In[15]
 

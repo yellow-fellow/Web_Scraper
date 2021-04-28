@@ -321,8 +321,6 @@ def readCSV(csvFile, user_input):
         temp_dict['8_date'] = {"S": str(date.today())}
         # ----------------------------------------------------------
 
-        user_input = input(
-            "Select 1 to upload data onto Google Spreadsheet. Select 2 to print out in console. \n")
         if (user_input == 1):
             # ----------------------------------------------------------
             # Write data into an array to push to google sheets

@@ -3,19 +3,20 @@
 This is a web scraper script that scrapes content from all the meta tags in a given URL. It takes in a CSV of URLs from a designated S3 bucket, and outputs the relevant content on a public Google Spreadsheet, as well as DynamoDB tables. The purpose of this script is to hasten the process of conducting Quality Assurance (QA).
 
 ## Packages
-- pip install python-csv
-- pip install smart-open
-- pip install bs4
-- pip install urllib3
-- pip install requests
-- pip install google-trans-new
-- pip install jsonlib
-- pip install pandas
-- pip install boto3
-- pip install times
-- pip install DateTime
-- pip install gspread
-- pip install oauth2client
+- pip3 install python-csv
+- pip3 install smart-open
+- pip3 install lxml
+- pip3 install bs4
+- pip3 install urllib3
+- pip3 install requests
+- pip3 install google-trans-new
+- pip3 install jsonlib
+- pip3 install pandas
+- pip3 install boto3
+- pip3 install times
+- pip3 install DateTime
+- pip3 install gspread
+- pip3 install oauth2client
 
 ## Required Keys
 - Google Spreadsheet authentication

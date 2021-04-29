@@ -18,3 +18,4 @@ client_secret.json
 test_code.py
 contextual-targeting.csv
 scrapy.csv
+std.log

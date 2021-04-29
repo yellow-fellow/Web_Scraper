@@ -14,6 +14,7 @@ import time
 from datetime import date
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import logging
 
 translator = google_translator()
 scope = ['https://spreadsheets.google.com/feeds',
@@ -22,6 +23,14 @@ creds = ServiceAccountCredentials.from_json_keyfile_name(
     'client_secret.json', scope)
 client = gspread.authorize(creds)
 sheet = client.open('scrapy').sheet1
+
+logging.basicConfig(filename="std.log",
+                    format='%(asctime)s %(message)s',
+                    filemode='a')
+
+logger = logging.getLogger()
+
+logger.setLevel(logging.CRITICAL)
 
 segments_list = ['female', 'avid-news-readers', 'celebrity', 'avid-political-news-readers', 'auto-enthusiasts', 'motocycle-enthusiasts', 'sports-fans', 'football-enthusiasts',
                  'family', 'parenting', 'mobile-enthusiasts', 'consumer-electronics', 'business-professionals', 'beauty', 'fashion', 'movie', 'kids', 'education', 'shoppers']
@@ -103,6 +112,7 @@ def readCSV(csvFile, user_input):
             }).status_code
 
             if (response == 404):
+                logger.critical(f'This <{website}> is invalid!')
                 print(f'This <{website}> is invalid! ')
                 continue
         except:

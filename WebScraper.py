@@ -97,6 +97,14 @@ def readCSV(csvFile, user_input):
             html_text = requests.get(website, headers={
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
             }).text
+
+            response = requests.get(website, headers={
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
+            }).status_code
+
+            if (response == 404):
+                print(f'This <{website}> is invalid! ')
+                continue
         except:
             pass
 
@@ -129,7 +137,7 @@ def readCSV(csvFile, user_input):
             temp_dict['7_gt_description'] = {"S": ddb_dict['7_gt_description']}
             temp_dict['8_date'] = {"S": str(date.today())}
 
-            if (user_input == 1):
+            if (user_input == "1"):
                 # ----------------------------------------------------------
                 # Write data into an array to push to google sheets
                 excel_upload(temp_dict)
@@ -321,7 +329,7 @@ def readCSV(csvFile, user_input):
         temp_dict['8_date'] = {"S": str(date.today())}
         # ----------------------------------------------------------
 
-        if (user_input == 1):
+        if (user_input == "1"):
             # ----------------------------------------------------------
             # Write data into an array to push to google sheets
             excel_upload(temp_dict)

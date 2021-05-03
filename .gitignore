@@ -19,3 +19,6 @@ test_code.py
 contextual-targeting.csv
 scrapy.csv
 std.log
+test_invalid_URLs.csv
+test_valid_URLs_exist.csv
+test_valid_URLs_notExist.csv

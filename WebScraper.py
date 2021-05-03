@@ -62,6 +62,7 @@ def ct_exists(temp_dict):
         response = ct_table.get_item(
             Key={'domain': temp_dict['0_domain']['S'], 'path': temp_dict['1_path']['S']})
         ct_item = response['Item']
+        print("working!")
         return (ct_item['segments'])
     except:
         ct_item = None
@@ -83,10 +84,11 @@ def excel_upload(temp_dict):
     sheet.append_row(excel_array)
     excel_row = sheet.find(temp_dict['url']['S']).row
     try:
-        existing_segments = ct_exists(temp_dict)
-        for segment in existing_segments:
-            positional_index = segments_list.index(segment)
-            sheet.update_cell(excel_row, 11 + positional_index, True)
+        if (user_input == "2"):
+            existing_segments = ct_exists(temp_dict)
+            for segment in existing_segments:
+                positional_index = segments_list.index(segment)
+                sheet.update_cell(excel_row, 11 + positional_index, True)
     except:
         pass
 
@@ -124,7 +126,7 @@ def readCSV(csvFile, user_input):
         except:
             continue
 
-        if exists(website):
+        if (exists(website) and user_input == "2"):
             ddb_dict = exists(website)
 
             temp_dict['0_domain'] = {"S": ddb_dict['0_domain']}
@@ -148,12 +150,12 @@ def readCSV(csvFile, user_input):
             temp_dict['8_date'] = {"S": str(date.today())}
 
             if (user_input == "1"):
+                print(json.dumps(temp_dict, sort_keys=True, indent=4))
+            else:
                 # ----------------------------------------------------------
                 # Write data into an array to push to google sheets
                 excel_upload(temp_dict)
                 # ----------------------------------------------------------
-            else:
-                print(json.dumps(temp_dict, sort_keys=True, indent=4))
             # ----------------------------------------------------------
             # Write data into JSON file
             # with open('QA_test.json', 'a') as outfile:
@@ -340,6 +342,8 @@ def readCSV(csvFile, user_input):
         # ----------------------------------------------------------
 
         if (user_input == "1"):
+            print(json.dumps(temp_dict, sort_keys=True, indent=4))
+        else:
             # ----------------------------------------------------------
             # Write data into an array to push to google sheets
             excel_upload(temp_dict)
@@ -347,8 +351,6 @@ def readCSV(csvFile, user_input):
             # ----------------------------------------------------------
             ddb_upload(table_name, temp_dict)
             # ----------------------------------------------------------
-        else:
-            print(json.dumps(temp_dict, sort_keys=True, indent=4))
 
         # ----------------------------------------------------------
         # Write data into JSON file
@@ -360,7 +362,7 @@ def readCSV(csvFile, user_input):
 
 if __name__ == "__main__":
     user_input = input(
-        "Select 1 to upload data onto Google Spreadsheet. Select 2 to print out in console. \n")
+        "Select 1 to print out in console. Select 2 to upload data onto Google Spreadsheet. Select 3 to scrape ALL URLs. \n")
     start_time = time.time()
 
     # ----------------------------------------------------------

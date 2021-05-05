@@ -409,12 +409,6 @@ if __name__ == "__main__":
         except:
             pass
     # ----------------------------------------------------------
-
-    # ----------------------------------------------------------
-    # Testing for single CSV file
-    # with open('QA_test_7.csv') as csvfile:
-    #     readCSV(csvfile)
-    # ----------------------------------------------------------
     print("--- %s seconds ---" % (time.time() - start_time))
 
 # %%

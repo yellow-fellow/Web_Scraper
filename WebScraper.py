@@ -62,7 +62,6 @@ def ct_exists(temp_dict):
         response = ct_table.get_item(
             Key={'domain': temp_dict['0_domain']['S'], 'path': temp_dict['1_path']['S']})
         ct_item = response['Item']
-        print("working!")
         return (ct_item['segments'])
     except:
         ct_item = None
@@ -202,7 +201,7 @@ def readCSV(csvFile, user_input):
 
         # ----------------------------------------------------------
         # Search for the "categories" metatag and add it into the output (In array structure)
-        categories = "NIL"
+        categories = ""
         for tag in meta_tags:
             try:
                 if ("category" in tag['property'].lower()):
@@ -230,6 +229,9 @@ def readCSV(csvFile, user_input):
             except:
                 pass
 
+        if not categories:
+            categories = "NIL"
+
         categories = categories.encode("ascii", "ignore")
         categories = categories.decode("utf-8")
         categories_array = categories.split()
@@ -240,7 +242,7 @@ def readCSV(csvFile, user_input):
 
         # ----------------------------------------------------------
         # Search for the "keywords" metatag and add it into the output (In array structure)
-        keywords = "NIL"
+        keywords = ""
         for tag in meta_tags:
             try:
                 if ("keyword" in tag['property'].lower()):
@@ -261,6 +263,10 @@ def readCSV(csvFile, user_input):
                     keywords += " " + a.text
             except:
                 pass
+
+        if not keywords:
+            keywords = "NIL"
+
         keywords = keywords.replace(",", " ")
         keywords = keywords.encode("ascii", "ignore")
         keywords = keywords.decode("utf-8")
@@ -387,14 +393,18 @@ if __name__ == "__main__":
 
     # ----------------------------------------------------------
     # Read and combine all CSVs in a bucket & output in a JSON file
+    s3_resource = boto3.resource('s3')
+
     s3_client = boto3.client('s3')
     s3_bucket = 'shaohang-development'
 
-    for key in s3_client.list_objects(Bucket=s3_bucket, Prefix='dmp2')['Contents']:
+    for key in s3_client.list_objects(Bucket=s3_bucket, Prefix='dmp')['Contents']:
         value = key['Key']
         try:
             with open(f's3://{s3_bucket}/{value}', 'r') as f:
                 readCSV(f, user_input)
+            response = s3_resource.Object(s3_bucket, f'scraped_CSVs/{key["Key"].split("/")[1]}').copy_from(
+                CopySource=f'{s3_bucket}/{value}')
             s3_client.delete_object(Bucket=s3_bucket, Key=value)
         except:
             pass

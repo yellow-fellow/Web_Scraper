@@ -15,6 +15,7 @@ from datetime import date
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import logging
+import datetime
 
 translator = google_translator()
 scope = ['https://spreadsheets.google.com/feeds',
@@ -47,12 +48,26 @@ def ddb_upload(table_name, record):
 # ----------------------------------------------------------
 
 
+def country(country_input):
+    if country_input == '1':
+        return "Indonesia"
+    elif country_input == '2':
+        return "Philippines"
+    elif country_input == '3':
+        return "Malaysia"
+    elif country_input == '4':
+        return "Taiwan"
+    else:
+        return "Error, please provide an input from 1 to 4 only."
+
+
 def exists(site):
     try:
         response = table.get_item(Key={'url': site})
         item = response['Item']
         return item
     except:
+        print("There's an error with the exists function!")
         item = None
         return item
 
@@ -64,6 +79,7 @@ def ct_exists(temp_dict):
         ct_item = response['Item']
         return (ct_item['segments'])
     except:
+        print("There's an error with the ct_exists function!")
         ct_item = None
 
 
@@ -89,6 +105,7 @@ def excel_upload(temp_dict):
                 positional_index = segments_list.index(segment)
                 sheet.update_cell(excel_row, 11 + positional_index, True)
     except:
+        print("There's an error with the excel_upload function!")
         pass
 
 
@@ -117,12 +134,14 @@ def readCSV(csvFile, user_input):
                 print(f'This <{website}> is invalid! ')
                 continue
         except:
+            print("There's an error with getting request from the site!")
             pass
 
         try:
             soup = BeautifulSoup(html_text, 'lxml')
             meta_tags = soup.find_all('meta')
         except:
+            print("There's an error with beautiful soup!")
             continue
 
         if (exists(website) and user_input == "2"):
@@ -178,6 +197,7 @@ def readCSV(csvFile, user_input):
             # ----------------------------------------------------------
 
         except:
+            print("There's an error with the domain parsing function!")
             pass
 
         # ----------------------------------------------------------
@@ -190,11 +210,16 @@ def readCSV(csvFile, user_input):
         try:
             # ----------------------------------------------------------
             # Get the domain from the URL
-            path = urlparse(site)[2][0: urlparse(site)[2].find('/', 1)]
+            if ((urlparse(site)[2].find('/', 1)) == -1):
+                path = urlparse(site)[2]
+            else:
+                path = urlparse(site)[2][0: urlparse(site)[2].find('/', 1)]
+
             temp_dict['1_path'] = {"S": path}
             # ----------------------------------------------------------
 
         except:
+            print("There's an error with the path parsing function!")
             pass
 
         # ----------------------------------------------------------
@@ -207,26 +232,31 @@ def readCSV(csvFile, user_input):
                 if ("category" in tag['property'].lower()):
                     categories += " " + tag['content']
             except:
+                print("There's an error with the categories parsing function!")
                 pass
             try:
                 if ("categories" in tag['property'].lower()):
                     categories += " " + tag['content']
             except:
+                print("There's an error with the categories parsing function!")
                 pass
             try:
                 if ("article:section" in tag['property'].lower()):
                     categories += " " + tag['content']
             except:
+                print("There's an error with the categories parsing function!")
                 pass
             try:
                 if ("category" in tag['name'].lower()):
                     categories += " " + tag['content']
             except:
+                print("There's an error with the categories parsing function!")
                 pass
             try:
                 if ("categories" in tag['name'].lower()):
                     categories += " " + tag['content']
             except:
+                print("There's an error with the categories parsing function!")
                 pass
 
         if not categories:
@@ -248,11 +278,13 @@ def readCSV(csvFile, user_input):
                 if ("keyword" in tag['property'].lower()):
                     keywords += " " + tag['content']
             except:
+                print("There's an error with the keywords parsing function!")
                 pass
             try:
                 if ("keyword" in tag['name'].lower()):
                     keywords += " " + tag['content']
             except:
+                print("There's an error with the keywords parsing function!")
                 pass
 
         div_tags = soup.find_all("div")
@@ -262,6 +294,7 @@ def readCSV(csvFile, user_input):
                 for a in a_tags:
                     keywords += " " + a.text
             except:
+                print("There's an error with the keywords parsing function!")
                 pass
 
         if not keywords:
@@ -288,6 +321,7 @@ def readCSV(csvFile, user_input):
                     title = title.decode("utf-8")
                     break
             except:
+                print("There's an error with getting the title!")
                 pass
         temp_dict['4_title'] = {"S": title}
         # ----------------------------------------------------------
@@ -310,6 +344,7 @@ def readCSV(csvFile, user_input):
                     description = description.decode("utf-8")
                     break
             except:
+                print("There's an error with getting the description!")
                 pass
 
         temp_dict['5_description'] = {"S": description}
@@ -322,6 +357,7 @@ def readCSV(csvFile, user_input):
             temp_dict['url'] = {"S": website}
             # ----------------------------------------------------------
         except:
+            print("There's an error with getting the URL!")
             pass
 
         gt_title = "NIL"
@@ -340,6 +376,7 @@ def readCSV(csvFile, user_input):
             temp_dict['7_gt_description'] = {"S": gt_description}
             # ----------------------------------------------------------
         except:
+            print("There's an error with getting the translated title and description!")
             pass
 
         # ----------------------------------------------------------
@@ -369,6 +406,8 @@ def readCSV(csvFile, user_input):
 if __name__ == "__main__":
     user_input = input(
         "Select 1 to print out in console. Select 2 to upload data onto Google Spreadsheet. Select 3 to scrape ALL URLs. \n")
+    country_input = country(str(input(
+        "Please provide an input from 1 to 4. \n 1. Indonesia \n 2. Philippines \n 3. Malaysia \n 4. Taiwan \n")))
     start_time = time.time()
 
     # ----------------------------------------------------------
@@ -398,17 +437,17 @@ if __name__ == "__main__":
     s3_client = boto3.client('s3')
     s3_bucket = 'shaohang-development'
 
-    for key in s3_client.list_objects(Bucket=s3_bucket, Prefix='dmp')['Contents']:
+    for key in s3_client.list_objects(Bucket=s3_bucket, Prefix=f'{country_input}/dmp/').get('Contents'):
         value = key['Key']
         try:
             with open(f's3://{s3_bucket}/{value}', 'r') as f:
                 readCSV(f, user_input)
-            response = s3_resource.Object(s3_bucket, f'scraped_CSVs/{key["Key"].split("/")[1]}').copy_from(
-                CopySource=f'{s3_bucket}/{value}')
+            s3_resource.Object(
+                s3_bucket, f'{country_input}/scraped_CSVs/year_{(datetime.date.today().strftime("%Y"))}/month_{datetime.date.today().strftime("%m")}/day_{datetime.date.today().strftime("%d")}/{key["Key"].split("/")[1]}').copy_from(CopySource=f'{s3_bucket}/{value}')
             s3_client.delete_object(Bucket=s3_bucket, Key=value)
         except:
             pass
-    # ----------------------------------------------------------
+        # ----------------------------------------------------------
     print("--- %s seconds ---" % (time.time() - start_time))
 
 # %%

@@ -67,7 +67,6 @@ def exists(site):
         item = response['Item']
         return item
     except:
-        print("There's an error with the exists function!")
         item = None
         return item
 
@@ -79,8 +78,8 @@ def ct_exists(temp_dict):
         ct_item = response['Item']
         return (ct_item['segments'])
     except:
-        print("There's an error with the ct_exists function!")
         ct_item = None
+        return ct_item
 
 
 def excel_upload(temp_dict):
@@ -232,31 +231,26 @@ def readCSV(csvFile, user_input):
                 if ("category" in tag['property'].lower()):
                     categories += " " + tag['content']
             except:
-                print("There's an error with the categories parsing function!")
                 pass
             try:
                 if ("categories" in tag['property'].lower()):
                     categories += " " + tag['content']
             except:
-                print("There's an error with the categories parsing function!")
                 pass
             try:
                 if ("article:section" in tag['property'].lower()):
                     categories += " " + tag['content']
             except:
-                print("There's an error with the categories parsing function!")
                 pass
             try:
                 if ("category" in tag['name'].lower()):
                     categories += " " + tag['content']
             except:
-                print("There's an error with the categories parsing function!")
                 pass
             try:
                 if ("categories" in tag['name'].lower()):
                     categories += " " + tag['content']
             except:
-                print("There's an error with the categories parsing function!")
                 pass
 
         if not categories:
@@ -278,13 +272,11 @@ def readCSV(csvFile, user_input):
                 if ("keyword" in tag['property'].lower()):
                     keywords += " " + tag['content']
             except:
-                print("There's an error with the keywords parsing function!")
                 pass
             try:
                 if ("keyword" in tag['name'].lower()):
                     keywords += " " + tag['content']
             except:
-                print("There's an error with the keywords parsing function!")
                 pass
 
         div_tags = soup.find_all("div")
@@ -294,7 +286,6 @@ def readCSV(csvFile, user_input):
                 for a in a_tags:
                     keywords += " " + a.text
             except:
-                print("There's an error with the keywords parsing function!")
                 pass
 
         if not keywords:
@@ -321,7 +312,6 @@ def readCSV(csvFile, user_input):
                     title = title.decode("utf-8")
                     break
             except:
-                print("There's an error with getting the title!")
                 pass
         temp_dict['4_title'] = {"S": title}
         # ----------------------------------------------------------
@@ -344,7 +334,6 @@ def readCSV(csvFile, user_input):
                     description = description.decode("utf-8")
                     break
             except:
-                print("There's an error with getting the description!")
                 pass
 
         temp_dict['5_description'] = {"S": description}
@@ -357,7 +346,6 @@ def readCSV(csvFile, user_input):
             temp_dict['url'] = {"S": website}
             # ----------------------------------------------------------
         except:
-            print("There's an error with getting the URL!")
             pass
 
         gt_title = "NIL"
@@ -376,7 +364,6 @@ def readCSV(csvFile, user_input):
             temp_dict['7_gt_description'] = {"S": gt_description}
             # ----------------------------------------------------------
         except:
-            print("There's an error with getting the translated title and description!")
             pass
 
         # ----------------------------------------------------------
@@ -392,7 +379,12 @@ def readCSV(csvFile, user_input):
             excel_upload(temp_dict)
             # ----------------------------------------------------------
             # ----------------------------------------------------------
-            ddb_upload(table_name, temp_dict)
+            try:
+                ddb_upload(table_name, temp_dict)
+            except:
+                print(
+                    f"This {temp_dict.get('url')} is not able to be uploaded onto DDB.")
+                pass
             # ----------------------------------------------------------
 
         # ----------------------------------------------------------

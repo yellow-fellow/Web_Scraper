@@ -104,7 +104,6 @@ def excel_upload(temp_dict):
                 positional_index = segments_list.index(segment)
                 sheet.update_cell(excel_row, 11 + positional_index, True)
     except:
-        print("There's an error with the excel_upload function!")
         pass
 
 
